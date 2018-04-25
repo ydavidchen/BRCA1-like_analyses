@@ -1,6 +1,7 @@
 ################################################################################################
 # Cox Models by Binary SVM Status, Stratified by TNBC Status, in TCGA
 # Script author: David Chen
+# Date: 02/28/2018; 03/04/2018
 # Notes:
 ################################################################################################
 
@@ -8,6 +9,7 @@ rm(list = ls())
 
 library(survival)
 library(survminer)
+library(doParallel); registerDoParallel(detectCores() - 1)
 
 ## Load study population:
 my_samples <- read.csv("~/repos/BRCA1ness_by_SVM/annotations_and_backups/030418_TCGA_study_population.txt", header=T, sep="\t", stringsAsFactors=F);
@@ -54,9 +56,28 @@ my_samples$OS_MONTHS[my_samples$OS_MONTHS >= adminCensor] <- adminCensor;
 ## Exclude tumors without stage:
 my_samples <- subset(my_samples, ! is.na(Stage) );
 
+#-------------------------------------------------Non-TNBCs-------------------------------------------------
+my_samples.NonTNBCs <- subset(my_samples, TNBC=="Non-TNBC"); 
+
 ## CoxPH:
 res.cox.other <- coxph(
   Surv(time=OS_MONTHS, event=event) ~ group + Age + Stage + Subtype, 
-  data = subset(my_samples, TNBC=="Non-TNBC")
+  data = my_samples.NonTNBCs 
 );
 summary(res.cox.other) 
+
+## Kaplan-Meier:
+fit.other <- survfit(
+  Surv(time=OS_MONTHS, event=event) ~ SVM_BRCA1, 
+  my_samples.NonTNBCs
+);
+ggsurvplot(
+  fit.other, 
+  data = my_samples.NonTNBCs,
+  palette = c("mediumorchid","darkolivegreen3"),
+  risk.table = TRUE,
+  pval = TRUE
+) + 
+  ggtitle("TCGA receptor positive tumors") +
+  labs(x="Time (months)")
+

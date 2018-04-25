@@ -1,16 +1,20 @@
 ##########################################################################################################
-# Relation of Mutational Rates with SVM BRCA1-like Status
+# Relation of Total Mutational Rates with SVM BRCA1-like Status
 # Script author: David Chen
+# Date: 02/23/18
 # Notes:
 ##########################################################################################################
 
 rm(list=ls())
 
 library(gdata)
+library(ggplot2)
 library(lmtest)
 library(MASS)
 library(matrixStats)
+library(reshape2)
 library(sandwich)
+library(doParallel); registerDoParallel(detectCores() - 1)
 
 ## Clinical annotation for the study population:
 my_samples <- read.csv("~/repos/BRCA1ness_by_SVM/annotations_and_backups/030418_TCGA_study_population.txt", header=T, sep="\t", stringsAsFactors=F);
@@ -45,3 +49,24 @@ fit.rates <- rlm(
 summary(fit.rates)
 svar.rlm <- sandwich(fit.rates);
 coeftest(fit.rates, vcov.=svar.rlm);
+
+## Data visualization:
+comp.mat$BRCAness[comp.mat$SVM_BRCA1=="BRCA1-like"] <- "BRCA1-like (n=205)";
+comp.mat$BRCAness[comp.mat$SVM_BRCA1=="non-BRCA1-like"] <- "non-BRCA1-like (n=457)";
+png("~/Downloads/BRCA1ness_figures/Figure2B.png", res=300, units="in", height=8.27, width=5.84);
+ggplot(comp.mat, aes(x=BRCAness, y=Mutation.Rate...Mbp., color=BRCAness)) +
+  geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0) +
+  geom_point(aes(color=BRCAness), position=position_jitterdodge(dodge.width=0.5), alpha=0.3) + 
+  scale_color_manual(values=c("mediumorchid3","darkolivegreen3")) +
+  scale_fill_manual(values=c("mediumorchid3","darkolivegreen3")) +
+  theme_classic() +
+  theme(axis.text.x=element_text(size=16,color="black"), axis.text.y=element_text(size=16,color="black"),
+        axis.title.x=element_blank(), axis.title.y=element_text(size=16,color="black"),
+        legend.position="top", legend.title=element_blank(),legend.text=element_text(size=14,color="black",face="bold"),
+        strip.text.x=element_text(size=12,colour="black",face="bold")) +    
+  labs(y="Mutation rate per mega base-pair (Mb)") +
+  geom_segment(aes(x=1, y=11.5, xend=2, yend=11.5), size=0.3, inherit.aes=F) +
+  geom_segment(aes(x=1, y=10, xend=1, yend=11.5), size=0.3, inherit.aes=F) +
+  geom_segment(aes(x=2, y=8, xend=2, yend=11.5), size=0.3, inherit.aes=F) +
+  annotate("text", x=1.5, y=12, label="P = 0.0015**", size=6)
+dev.off();
