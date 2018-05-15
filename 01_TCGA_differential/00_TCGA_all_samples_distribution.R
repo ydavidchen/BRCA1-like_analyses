@@ -15,18 +15,13 @@ library(doParallel); registerDoParallel(detectCores() - 1)
 
 ## Clinical annotation for study population:
 my_samples <- read.csv("~/repos/BRCA1ness_by_SVM/annotations_and_backups/030418_TCGA_study_population.txt", header=T, sep="\t", stringsAsFactors=F);
-
 mySampNoExclu <- read.csv("~/repos/BRCA1ness_by_SVM/annotations_and_backups/031318_Complete_Sample_Sheet_No_Exclusion.txt", header=T, sep="\t", stringsAsFactors=F);
 mySampNoExclu$includedInBRCA1Analysis <- mySampNoExclu$patients %in% my_samples$patients;
 
-## Define clinical subtype:
-mySampNoExclu$Clinical_Subtype[mySampNoExclu$ER=="Positive" & mySampNoExclu$HER2=="Negative"] <- "ER Positive";
-mySampNoExclu$Clinical_Subtype[mySampNoExclu$HER2=="Positive"] <- "HER2 Positive";
-mySampNoExclu$Clinical_Subtype[mySampNoExclu$TNBC=="TNBC"] <- "TNBC";
-mySampNoExclu$Clinical_Subtype[is.na(mySampNoExclu$Clinical_Subtype)] <- "Other"; 
-mySampNoExclu$Clinical_Subtype[is.na(mySampNoExclu$TNBC)] <- NA; 
+## Any hormone receptor positive:
+mySampNoExclu$anyRecepPos <- mySampNoExclu$ER=="Positive" |  mySampNoExclu$PR=="Positive" | mySampNoExclu$HER2=="Positive";
 
-#---------------------------------------Distribution of BRCA1-like probability---------------------------------------
+#---------------------------------------Distribution of BRCA1-like probability scores---------------------------------------
 ggplot(mySampNoExclu, aes(x=reorder(patients, BRCA1_prob), y=BRCA1_prob, fill=TNBC)) + #fill=DNAm_avail
   geom_bar(stat="identity") +
   geom_hline(yintercept=0.50, linetype="dashed") + 
@@ -39,16 +34,20 @@ ggplot(mySampNoExclu, aes(x=reorder(patients, BRCA1_prob), y=BRCA1_prob, fill=TN
         axis.title=element_text(size=15, color="black"),
         legend.position="top",legend.title=element_blank(),legend.text=element_text(size=12,color="black") )
 
-#---------------------------------------------Table One---------------------------------------------
-myFactorVars <- c("Stage","ER","PR","HER2","Clinical_Subtype","PAM50", "race", "includedInBRCA1Analysis");
+#---------------------------------------------Table One (part of)---------------------------------------------
+myFactorVars <- c("Stage","ER","PR","HER2","TNBC","PAM50", "race", "anyRecepPos", "includedInBRCA1Analysis");
 myVars <- c("Age", myFactorVars);
 myTableOne <- CreateTableOne(
   data = mySampNoExclu, 
   vars = myVars, 
   strata = "SVM_BRCA1",
   factorVars = myFactorVars,
-  smd = FALSE, 
-  test = FALSE,
+  smd = TRUE,
+  test = TRUE,
+  testExact = fisher.test,
+  argsExact = list(workspace = 2*10^5),
+  testNormal = oneway.test,
+  argsNormal = list(var.equal=TRUE),
   includeNA = TRUE
-); 
-y <- print(myTableOne, showAllLevels=TRUE); 
+);
+myTableOne
