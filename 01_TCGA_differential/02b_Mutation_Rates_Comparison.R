@@ -65,20 +65,17 @@ coeftest(fit.rates, vcov.=svar.rlm, type="HC0");
 ## Data visualization:
 comp.mat$BRCAness[comp.mat$SVM_BRCA1=="BRCA1-like"] <- "BRCA1-like (n=205)";
 comp.mat$BRCAness[comp.mat$SVM_BRCA1=="non-BRCA1-like"] <- "non-BRCA1-like (n=457)";
-png("~/Downloads/BRCA1ness_figures/Figure2B.png", res=300, units="in", height=8.27, width=5.84);
-ggplot(comp.mat, aes(x=BRCAness, y=Mutation.Rate...Mbp., color=BRCAness)) +
+png("~/Downloads/BRCA1ness_figures/051618_Figure3B.png", res=300, units="in", height=8.27, width=6);
+ggplot(comp.mat, aes(x=BRCAness, y=Mutation.Rate...Mbp.)) +
   geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0) +
-  geom_point(aes(color=BRCAness), position=position_jitterdodge(dodge.width=0.5), alpha=0.3) + 
-  scale_color_manual(values=c("mediumorchid3","darkolivegreen3")) +
-  scale_fill_manual(values=c("mediumorchid3","darkolivegreen3")) +
+  geom_point(position=position_jitter(width=0.25), alpha=0.3) + 
   theme_classic() +
-  theme(axis.text.x=element_text(size=20,color="black"), axis.text.y=element_text(size=20,color="black"),
-        axis.title.x=element_blank(), axis.title.y=element_text(size=22,color="black"),
-        legend.position="top", legend.title=element_blank(),legend.text=element_text(size=18,color="black",face="bold"),
-        strip.text.x=element_text(size=12,colour="black",face="bold")) +    
-  labs(y="Mutation rate per mega base-pair (Mb)") +
+  theme(axis.text.x=element_text(size=21,color="black"), axis.text.y=element_text(size=21,color="black"),
+        axis.title.x=element_blank(), axis.title.y=element_text(size=30,color="black") ) +    
+  labs(y="Mutation rate per Mb") +
   geom_segment(aes(x=1, y=11.5, xend=2, yend=11.5), size=0.3, inherit.aes=F) +
   geom_segment(aes(x=1, y=10, xend=1, yend=11.5), size=0.3, inherit.aes=F) +
   geom_segment(aes(x=2, y=8, xend=2, yend=11.5), size=0.3, inherit.aes=F) +
-  annotate("text", x=1.5, y=12, label="P = 0.017**", size=7)
+  annotate("text", x=1.5, y=11.95, label="* P = 0.017", size=7)
 dev.off();
+

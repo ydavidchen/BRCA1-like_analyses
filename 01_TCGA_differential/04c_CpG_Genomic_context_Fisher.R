@@ -22,7 +22,7 @@ annot.450k$isEnhancer <- annot.450k$Enhancer=="TRUE" | annot.450k$Phantom != "";
 annot.450k$isPromoter <- grepl("TSS", annot.450k$UCSC_RefGene_Group);
 
 #------------------------------------------------Data/results loading------------------------------------------------
-DMPs <- dmps;
+DMPs <- dmps; #copy
 colnames(DMPs) <- gsub("ID", "Name", colnames(DMPs)); #for merging
 DMPs <- merge(DMPs, annot.450k, by="Name");
 
@@ -49,16 +49,16 @@ DMPs$Shelf <- ifelse(DMPs$Relation_to_Island %in% c("N_Shelf", "S_Shelf"), 1, 0)
 table(DMPs$isConsideredDifferential, useNA='ifany') #quick check
 
 plotList <- list();
-for(directionInCF in c("202 HYPOmethylated","148 HYPERmethylated") ){ #"350 differentially methylated"
+for(directionInBRCA in c("202 HYPOmethylated","148 HYPERmethylated") ){ #"350 differentially methylated"
   ## Enriched subset & associated color:
   ## DIFFERENT FOR EACH ITERATION!
-  if(directionInCF == "148 HYPERmethylated"){
+  if(directionInBRCA == "148 HYPERmethylated"){
     DMPs.sig <- subset(DMPs, isConsideredDifferential=="HYPER");
     myColor <- "darkred";
-  } else if(directionInCF == "202 HYPOmethylated") {
+  } else if(directionInBRCA == "202 HYPOmethylated") {
     DMPs.sig <- subset(DMPs, isConsideredDifferential=="HYPO");
     myColor <- "navy";
-  } else if(directionInCF == "350 differentially methylated") {
+  } else if(directionInBRCA == "350 differentially methylated") {
     DMPs.sig <- subset(DMPs, isConsideredDifferential != "FALSE") #both directions
     myColor <- "black";
   }
@@ -96,7 +96,7 @@ for(directionInCF in c("202 HYPOmethylated","148 HYPERmethylated") ){ #"350 diff
     Input = table(DMPs$OpenSea)
   ); 
   OpenSeaFisher <- OpenSeaFisher[ , c(2,1)]; #Set `1` (yes) as first column
-
+  
   ## Fisher tests:
   x <- fisher.test(promoterFisher);
   y <- fisher.test(enhancerFisher);
@@ -112,25 +112,29 @@ for(directionInCF in c("202 HYPOmethylated","148 HYPERmethylated") ){ #"350 diff
     CI.upper = c(x$conf.int[[2]], y$conf.int[[2]], z$conf.int[[2]], w$conf.int[[2]], u$conf.int[[2]]),
     P = c(x$p.value, y$p.value, z$p.value, w$p.value, u$p.value)
   );
-
+  
   ## Forest ggplot:
   plt.summFisher <- summFisher; #copy
   plt.summFisher$Category <- factor( rownames(plt.summFisher), levels=rev(c("Promoter","Enhancer","DNase","Island","OpenSea")) );
   plt.summFisher$P <- signif(plt.summFisher$P, 3);
-  plotList[[directionInCF]] <- ggplot(plt.summFisher, aes(x=Category, y=OR, ymin=CI.lower, ymax=CI.upper)) +
-    geom_pointrange(size=1, color=myColor) +
+  write.csv(plt.summFisher, file=paste0("~/Downloads/BRCA1ness_figures/", directionInBRCA, ".csv"), row.names=F, quote=F );
+  plotList[[directionInBRCA]] <- ggplot(plt.summFisher, aes(x=Category, y=OR, ymin=CI.lower, ymax=CI.upper)) +
+    geom_pointrange(size=0.6, color=myColor) +
     geom_hline(yintercept=1.00,size=0.2,linetype="dashed",color=myColor) +
     coord_flip() + #order: left to right becomes bottom to up
     scale_y_continuous(limits=c(-0.25,4.5)) + #consistent scale for all
     theme_classic() +
     theme(axis.line=element_line(color=myColor), axis.ticks=element_line(color=myColor),
-          axis.text=element_text(size=20,color=myColor), title=element_text(size=20,face="bold",color=myColor),
-          axis.title.x=element_text(size=20,face="bold",color=myColor), axis.title.y=element_blank()) +
-    labs(x="", y="Odds Ratio (OR)", title=paste(directionInCF,"CpGs in BRCA1-like Tumors")) +
-    annotate("text", 5.15, plt.summFisher$OR[1], label=paste("P =", plt.summFisher$P[1]),size=7,color=myColor) +
-    annotate("text", 4.15, plt.summFisher$OR[2], label=paste("P =", plt.summFisher$P[2]),size=7,color=myColor) +
-    annotate("text", 3.15, plt.summFisher$OR[3], label=paste("P =", plt.summFisher$P[3]),size=7,color=myColor) +
-    annotate("text", 2.15, plt.summFisher$OR[4], label=paste("P =", plt.summFisher$P[4]),size=7,color=myColor) +
-    annotate("text", 1.15, plt.summFisher$OR[5], label=paste("P =", plt.summFisher$P[5]),size=7,color=myColor)
+          axis.text=element_text(size=15,color=myColor), title=element_text(size=13,face="bold",color=myColor),
+          axis.title.x=element_text(size=16,face="bold",color=myColor), axis.title.y=element_blank()) +
+    labs(x="", y="Odds Ratio (OR)", title=paste(directionInBRCA,"CpGs in BRCA1-like")) +
+    annotate("text", 5.15, plt.summFisher$OR[1], label=paste("P =", plt.summFisher$P[1]),size=5,color=myColor) +
+    annotate("text", 4.15, plt.summFisher$OR[2], label=paste("P =", plt.summFisher$P[2]),size=5,color=myColor) +
+    annotate("text", 3.15, plt.summFisher$OR[3], label=paste("P =", plt.summFisher$P[3]),size=5,color=myColor) +
+    annotate("text", 2.15, plt.summFisher$OR[4], label=paste("P =", plt.summFisher$P[4]),size=5,color=myColor) +
+    annotate("text", 1.15, plt.summFisher$OR[5], label=paste("P =", plt.summFisher$P[5]),size=5,color=myColor)
 }
-grid.arrange(grobs=plotList, ncol=2)
+
+png("~/Downloads/BRCA1ness_figures/Figure4B.png", res=300, units="in", height=5, width=11.69);
+grid.arrange(grobs=plotList, ncol=2);
+dev.off();

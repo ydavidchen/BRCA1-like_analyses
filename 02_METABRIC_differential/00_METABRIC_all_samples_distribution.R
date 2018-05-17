@@ -38,7 +38,7 @@ dev.off();
 
 #---------------------------------------------Table One---------------------------------------------
 ## Table One on overall: 
-myFactorVars <- c("Stage","ER_STATUS","PR_STATUS","HER2_STATUS","anyRecepPos","isIncludedInBRCA1analysis");
+myFactorVars <- c("Stage","ER_STATUS","PR_STATUS","HER2_STATUS","CLAUDIN_SUBTYPE","anyRecepPos","isIncludedInBRCA1analysis");
 myVars <- c("AGE_AT_DIAGNOSIS", myFactorVars);
 myTableOne <- CreateTableOne(
   data = sampNoExclu, 
