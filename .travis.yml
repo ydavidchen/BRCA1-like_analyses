@@ -1,0 +1,9 @@
+language: R
+
+r:
+  - "3.3"
+  - "3.4"
+
+script:
+  - Rscript helper_functions.R
+  - Rscript plot_themes.R

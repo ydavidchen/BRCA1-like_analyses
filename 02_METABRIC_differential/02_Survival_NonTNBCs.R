@@ -1,16 +1,13 @@
 #######################################################################################################
-# CoxPH Modeling, METABRIC data set
+# CoxPH Modeling in METABRIC data set
 # Script authors: David Chen
+# Script maintainer: David Chen
 # Notes:
 #######################################################################################################
 
 rm(list = ls())
-
 library(survival)
 library(survminer)
-
-## Load Curtis et al. clinical data
-## Survival data already included:
 sample_clinical <- read.csv("~/repos/BRCA1ness_by_SVM/annotations_and_backups/030718_METABRIC_study_population.txt",sep="\t",stringsAsFactors=F);
 
 ## Define main variable of interest:
@@ -46,8 +43,7 @@ fit.other <- survfit(
   subset(sample_clinical, TNBC=="Non-TNBC")
 );
 ggsurvplot(
-  fit.other, 
-  data = subset(sample_clinical, TNBC=="Non-TNBC"), 
+  fit.other,
   palette = c("mediumorchid","darkolivegreen3"), 
   risk.table = TRUE, 
   pval = "CoxPH P = 0.21"

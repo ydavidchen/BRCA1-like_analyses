@@ -6,32 +6,16 @@
 ####################################################################################################
 
 rm(list=ls())
-
-library(ggplot2)
-library(matrixStats)
-library(reshape2)
-library(doParallel); registerDoParallel(detectCores() - 1)
-
-## Clinical annotation for study population:
-my_samples <- read.csv("~/repos/BRCA1ness_by_SVM/annotations_and_backups/030418_TCGA_study_population.txt", header=T, sep="\t", stringsAsFactors=F);
-my_samples <- subset(my_samples, TNBC=="Non-TNBC");
-
-## Load mutational signatures:
-rosenthalTCGA <- read.table("~/Dropbox (Christensen Lab)/Pan-cancer-analyses/TCGA_pan_cancer_signature_Rosenthal.txt", header=T);
-rosenthalTCGA$id <- gsub(".", "-", rosenthalTCGA$id, fixed=TRUE);
-rosenthalTCGA <- subset(rosenthalTCGA, cancer == "BRCA");
-colnames(rosenthalTCGA)[1] <- "patients"; #for merging
-
-## Merge:
+source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/helper_functions.R"); 
+source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/plot_themes.R");
+my_samples <- loadReceptorPositiveTumors(receptorPosOnly=TRUE);
+rosenthalTCGA <- loadMutationalSignatures();
 comp.mat <- merge(my_samples, rosenthalTCGA, by="patients");
 comp.mat <- subset(comp.mat, method == "WTSI");
-
-## For statistical tests:
 comp.mat$group[comp.mat$SVM_BRCA1=="BRCA1-like"] <- 1;
 comp.mat$group[comp.mat$SVM_BRCA1=="non-BRCA1-like"] <- 0;
 comp.mat$group <- as.factor(comp.mat$group);
-
-## For data visualization:
+table(comp.mat$group)
 comp.mat$BRCAness[comp.mat$SVM_BRCA1=="BRCA1-like"] <- "BRCA1-like (n=151)";
 comp.mat$BRCAness[comp.mat$SVM_BRCA1=="non-BRCA1-like"] <- "non-BRCA1-like (n=505)";
 
@@ -49,12 +33,7 @@ ggplot(comp.mat, aes(x=BRCAness, y=Signature.3, color=BRCAness)) +
   scale_fill_manual(values=c("mediumorchid3","darkolivegreen3")) +
   scale_color_manual(values=c("mediumorchid3","darkolivegreen3")) + 
   labs(y="Somatic Substitution Signature 3") +
-  theme_classic() +
-  theme(axis.text.x=element_text(size=16,color="black"), axis.text.y=element_text(size=16,color="black"),
-        axis.title.x=element_blank(), axis.title.y=element_text(size=16,color="black"),
-        legend.position="top", legend.title=element_blank(),legend.text=element_text(size=14,color="black",face="bold"),
-        strip.text.x=element_text(size=12,colour="black",face="bold")) +
-  
+  myBoxplotTheme +
   geom_segment(aes(x=1, y=1, xend=2, yend=1), size=0.3, inherit.aes=F) +
   geom_segment(aes(x=1, y=0.9, xend=1, yend=1), size=0.3, inherit.aes=F) +
   geom_segment(aes(x=2, y=0.8, xend=2, yend=1), size=0.3, inherit.aes=F) +
@@ -75,15 +54,9 @@ ggplot(comp.mat, aes(x=BRCAness, y=Signature.1, color=BRCAness)) +
   scale_fill_manual(values=c("mediumorchid3","darkolivegreen3")) +
   scale_color_manual(values=c("mediumorchid3","darkolivegreen3")) + 
   labs(y="Somatic Mutational Signature 1") +
-  theme_classic() +
-  theme(axis.text.x=element_text(size=16,color="black"), axis.text.y=element_text(size=16,color="black"),
-        axis.title.x=element_blank(), axis.title.y=element_text(size=16,color="black"),
-        legend.position="top", legend.title=element_blank(),legend.text=element_text(size=14,color="black",face="bold"),
-        strip.text.x=element_text(size=12,colour="black",face="bold")) +
-  
+  myBoxplotTheme +
   geom_segment(aes(x=1, y=1.02, xend=2, yend=1.02), size=0.3, inherit.aes=F) +
   geom_segment(aes(x=1, y=0.95, xend=1, yend=1.02), size=0.3, inherit.aes=F) +
   geom_segment(aes(x=2, y=1.01, xend=2, yend=1.02), size=0.3, inherit.aes=F) +
   annotate("text", x=1.5, y=1.04, label="P = 0.0056 **", size=7)
 dev.off();
-

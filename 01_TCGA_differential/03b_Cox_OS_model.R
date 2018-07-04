@@ -6,13 +6,10 @@
 ################################################################################################
 
 rm(list = ls())
-
 library(survival)
 library(survminer)
-library(doParallel); registerDoParallel(detectCores() - 1)
-
-## Load study population:
-my_samples <- read.csv("~/repos/BRCA1ness_by_SVM/annotations_and_backups/030418_TCGA_study_population.txt", header=T, sep="\t", stringsAsFactors=F);
+source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/helper_functions.R");
+my_samples <- loadReceptorPositiveTumors(receptorPosOnly=TRUE); 
 
 ## Merge in survival time (as data-availability check):
 clin.breast <- read.csv("~/repos/BRCA1ness_by_SVM/annotations_and_backups/TCGA-BRCA_clinical.csv", stringsAsFactors=F);
@@ -56,24 +53,20 @@ my_samples$OS_MONTHS[my_samples$OS_MONTHS >= adminCensor] <- adminCensor;
 ## Exclude tumors without stage:
 my_samples <- subset(my_samples, ! is.na(Stage) );
 
-#-------------------------------------------------Non-TNBCs-------------------------------------------------
-my_samples.NonTNBCs <- subset(my_samples, TNBC=="Non-TNBC"); 
-
 ## CoxPH:
 res.cox.other <- coxph(
   Surv(time=OS_MONTHS, event=event) ~ group + Age + Stage + Subtype, 
-  data = my_samples.NonTNBCs 
+  data = my_samples
 );
 summary(res.cox.other) 
 
 ## Kaplan-Meier:
 fit.other <- survfit(
   Surv(time=OS_MONTHS, event=event) ~ SVM_BRCA1, 
-  my_samples.NonTNBCs
+  my_samples
 );
 ggsurvplot(
-  fit.other, 
-  data = my_samples.NonTNBCs,
+  fit.other,
   palette = c("mediumorchid","darkolivegreen3"),
   risk.table = TRUE,
   pval = TRUE
