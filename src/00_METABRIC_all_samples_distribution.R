@@ -1,7 +1,7 @@
 #######################################################################################################
 # Explore clinical & survival data of METABRIC for Table 1/S1
-# Script authors: David Chen
-# Date: 03/13/2018
+# Script author: David Chen
+# Script maintainer: David Chen
 # Notes:
 #######################################################################################################
 

@@ -1,6 +1,7 @@
 ######################################################################################################
-# Verifying expression of miR with differential methylation
+# Verifying expression of miRNA showed differential methylation in BRCA1-like tumors
 # Script author: David Chen
+# Script maintainer: David Chen
 # Notes:
 # 1. miR124-2 / miR-124a2: HYPERmethylated in BRCA1-like; modulates proliferation (PMID:25731732)
 ######################################################################################################
@@ -21,10 +22,10 @@ my_miRs <- merge(
   my_samples[ , c("patients","SVM_BRCA1","Age","Stage","ER","PR","HER2")], 
   by="patients"
 );
+table(my_miRs$SVM_BRCA1)
 my_miRs$group[my_miRs$SVM_BRCA1 == "BRCA1-like"] <- 1;
 my_miRs$group[my_miRs$SVM_BRCA1 == "non-BRCA1-like"] <- 0;
 table(my_miRs$group)
-table(my_miRs$SVM_BRCA1)
 
 ## Statistical test:
 fit_miR124a2 <- lm(
@@ -34,18 +35,16 @@ fit_miR124a2 <- lm(
 summary(fit_miR124a2)
 
 ## Data visualization:
-my_miRs$BRCAness[my_miRs$SVM_BRCA1 == "BRCA1-like"] <- "BRCA1-like (n=106)";
-my_miRs$BRCAness[my_miRs$SVM_BRCA1 == "non-BRCA1-like"] <- "non-BRCA1-like (n=400)";
-table(my_miRs$BRCAness)
+my_miRs$BRCAness[my_miRs$SVM_BRCA1 == "BRCA1-like"] <- "BRCA1-like \n (n=106)";
+my_miRs$BRCAness[my_miRs$SVM_BRCA1 == "non-BRCA1-like"] <- "non-BRCA1-like \n (n=400)";
+myBoxplotTheme$legend.position <- "none"; 
 ggplot(my_miRs, aes(x=BRCAness, y=`hsa-mir-124-2`, color=BRCAness)) +
-  geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0, position=position_dodge(width=0.775)) + #must hide outliers if jitters are to be shown
-  geom_point(aes(color=BRCAness), position=position_jitterdodge(jitter.width=0.25), alpha=0.25) + # add jitter
-  scale_fill_manual(values=c("mediumorchid3","darkolivegreen3")) +
+  geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0, position=position_dodge(width=0.775)) +
+  geom_point(aes(color=BRCAness), position=position_jitterdodge(jitter.width=0.25), alpha=0.5) +
   scale_color_manual(values=c("mediumorchid3","darkolivegreen3")) + 
   labs(y="hsa-mir-124-2 miRseq Z-score") +
-  theme_classic() +
-  myBoxplotTheme  +
   geom_segment(aes(x=1, y=0, xend=2, yend=0), size=0.3, inherit.aes=F) +
   geom_segment(aes(x=1, y=-0.03, xend=1, yend=0), size=0.3, inherit.aes=F) +
   geom_segment(aes(x=2, y=-0.02, xend=2, yend=0), size=0.3, inherit.aes=F) +
-  annotate("text", x=1.5, y=0.005, label="P = 0.021 *", size=6)
+  annotate("text", x=1.5, y=0.005, label="* P = 0.021", size=6) +
+  myBoxplotTheme

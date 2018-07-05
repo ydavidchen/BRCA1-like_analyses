@@ -2,13 +2,12 @@
 # Comparison of Mutational Rates per Mb with SVM BRCA1-like Status
 # Script author: David Chen
 # Script maintainer: David Chen
-# Date: 02/23/18; 05/08/18 (revision)
 # Notes:
 ##########################################################################################################
 
 rm(list=ls())
 source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/helper_functions.R"); 
-source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/plot_themes.R"); 
+source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/plot_themes.R");
 library(lmtest)
 library(MASS)
 library(matrixStats)
@@ -39,13 +38,11 @@ coeftest(fit.rates, vcov.=svar.rlm, type="HC0");
 comp.mat$BRCAness[comp.mat$SVM_BRCA1=="BRCA1-like"] <- "BRCA1-like \n (n=138)";
 comp.mat$BRCAness[comp.mat$SVM_BRCA1=="non-BRCA1-like"] <- "non-BRCA1-like \n (n=453)";
 
-png("~/Downloads/BRCA1ness_figures/051618_Figure3A.png", res=300, units="in", height=8.27, width=6);
+png("~/Downloads/BRCA1ness_figures/Figure3A.png", res=300, units="in", height=8.27, width=6);
 ggplot(comp.mat, aes(x=BRCAness, y=Mutation.Rate...Mbp.)) +
   geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0) +
   geom_point(position=position_jitter(width=0.25), alpha=0.3) + 
-  theme_classic() +
-  theme(axis.text.x=element_text(size=21,color="black"), axis.text.y=element_text(size=21,color="black"),
-        axis.title.x=element_blank(), axis.title.y=element_text(size=30,color="black") ) +    
+  myBoxplotTheme +  
   labs(y="Mutation rate per Mb") +
   geom_segment(aes(x=1, y=11.5, xend=2, yend=11.5), size=0.3, inherit.aes=F) +
   geom_segment(aes(x=1, y=10, xend=1, yend=11.5), size=0.3, inherit.aes=F) +

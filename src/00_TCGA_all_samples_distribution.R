@@ -1,7 +1,7 @@
 #######################################################################################################
-# Explore TCGA breast tumor characteristics by SVM-BRCA1-like status
-# Script author: Y. David Chen
-# Script maintainer: Y. David Chen
+# TCGA breast tumor characteristics by SVM-BRCA1-like status
+# Script author: David Chen
+# Script maintainer: David Chen
 # Notes:
 #######################################################################################################
 

@@ -1,21 +1,19 @@
 #######################################################################################################
-# Explore Patient Survival
+# Exploratory analysis of patient survival by Kaplan-Meier Method in TCGA
 # Script author: David Chen
-# Date: 07/04/18
+# Script maintainer: David Chen
 # Notes:
 # 1. Survival data (OS, PFS, DFS) were from Liu et al. 2018 Cell
 #######################################################################################################
 
 rm(list=ls())
 library(gridExtra)
-library(matrixStats)
 source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/helper_functions.R"); 
 source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/plot_themes.R"); 
 
 ## Load study population & merge w/ survival data:
 my_samples <- loadReceptorPositiveTumors(receptorPosOnly=TRUE);
-
-metaSurv <- loadSurvivalMeta();
+metaSurv <- loadTCGASurvivalMeta();
 sum(metaSurv$patients %in% my_samples$patients)
 
 clin.breast <- merge(
@@ -32,7 +30,7 @@ sModels$PFS
 sModels$DFS
 
 ## Data visualization:
-myPlots <- drawKaplanMeier(sModels, pTheme=mySurvTheme); 
+myPlots <- drawKaplanMeier(sModels, pTheme=mySurvTheme);
 grid.arrange(
   myPlots$OS$plot, 
   myPlots$PFS$plot,

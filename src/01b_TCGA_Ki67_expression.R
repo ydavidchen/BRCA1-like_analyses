@@ -2,12 +2,12 @@
 # Comparing Ki-67 RNAseqV2 gene expression levels in TCGA
 # Script author: David Chen
 # Script maintainer: David Chen
-# Date: 03/14/18
 # Notes:
 ######################################################################################################
 
 rm(list=ls())
 source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/helper_functions.R");
+source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/plot_themes.R"); 
 
 ## Tumor annotation:
 my_samples <- loadReceptorPositiveTumors(receptorPosOnly=TRUE); 
@@ -34,18 +34,15 @@ summary(fitki67)
 
 ## Data visualization:
 table(ki67$group)
-ki67$BRCAness[ki67$group==1] <- "BRCA1-like (n=159)";
-ki67$BRCAness[ki67$group==0] <- "non-BRCA1-like (n=578)";
+ki67$BRCAness[ki67$group==1] <- "BRCA1-like \n (n=159)";
+ki67$BRCAness[ki67$group==0] <- "non-BRCA1-like \n (n=578)";
 
-png("~/Downloads/BRCA1ness_figures/051618_Figure3C.png", res=300, units="in", height=8.27, width=6);
+png("~/Downloads/BRCA1ness_figures/Figure3C.png", res=300, units="in", height=8.27, width=6);
 ggplot(ki67, aes(x=BRCAness, y=MKI67)) +
   geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0) +
   geom_point(position=position_jitter(width=0.25), alpha=0.3) + 
-  theme_classic() +
-  theme(axis.text.x=element_text(size=21,color="black"), axis.text.y=element_text(size=21,color="black"),
-        axis.title.x=element_blank(), axis.title.y=element_text(size=30,color="black") ) +    
+  myBoxplotTheme + 
   labs(y="MKI67 expression") +
-  
   geom_segment(aes(x=1, y=10000, xend=2, yend=10000), size=0.3, inherit.aes=FALSE) +
   geom_segment(aes(x=1, y=9000, xend=1, yend=10000), size=0.3, inherit.aes=FALSE) +
   geom_segment(aes(x=2, y=8000, xend=2, yend=10000), size=0.3, inherit.aes=FALSE) +

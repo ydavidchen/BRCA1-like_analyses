@@ -3,7 +3,8 @@
 ## Script maintainer: David Chen
 
 ## Data loading methods:
-loadReceptorPositiveTumors <- function(path="~/repos/BRCA1ness_by_SVM/annotations_and_backups/030418_TCGA_study_population.txt", receptorPosOnly=TRUE) {
+loadReceptorPositiveTumors <- function(path="~/repos/BRCA1ness_by_SVM/annotations_and_backups/030418_TCGA_study_population.txt", 
+                                       receptorPosOnly=TRUE) {
   #'@description Load clinical annotation for TCGA breast tumors that are positive for ER, PR, and/or HER2
   my_samples <- read.csv(path, header=TRUE, sep="\t", stringsAsFactors=FALSE);
   if(receptorPosOnly){ 
@@ -87,7 +88,7 @@ loadTCGAmiRNA <- function(path="~/Dropbox (Christensen Lab)/Breast_Cancer_Data_S
   return(miRExpr);
 }
 
-loadSurvivalMeta <- function(path="~/Dropbox (Christensen Lab)/Pan-cancer-analyses/Liu2018_Cell_TCGA_surv/Liu2018_Cell_TCGA-CDR.csv") {
+loadTCGASurvivalMeta <- function(path="~/Dropbox (Christensen Lab)/Pan-cancer-analyses/Liu2018_Cell_TCGA_surv/Liu2018_Cell_TCGA-CDR.csv") {
   #'@description Load TCGA pan-cancer survival data from Liu et al. 2018 Cell
   metaSurv <- read.csv(path, stringsAsFactors=FALSE);
   metaSurv[metaSurv=="#N/A"] <- NA;
@@ -106,6 +107,29 @@ loadSurvivalMeta <- function(path="~/Dropbox (Christensen Lab)/Pan-cancer-analys
   return(metaSurv); 
 }
 
+loadMETABRICtumors <- function(path="~/repos/BRCA1ness_by_SVM/annotations_and_backups/030718_METABRIC_study_population.txt",
+                               receptorPosOnly=TRUE) {
+  #'@description Load METABRIC breast tumor clinical annotation
+  sample_clinical <- read.csv(path, sep="\t",stringsAsFactors=FALSE);
+  if(receptorPosOnly) {
+    sample_clinical <- subset(sample_clinical, TNBC=="Non-TNBC"); 
+  }
+  return(sample_clinical); 
+}
+
+loadMETABRICarrayExpr <- function(path="~/Dropbox (Christensen Lab)/Breast_Cancer_Data_Sets/METABRIC_data_set_cBio/data_expression.txt") {
+  #'@description Load METABRIC breast tumor normalized gene expression TXT file
+  require(data.table);
+  arrayExpr <- fread(path);
+  class(arrayExpr) <- "data.frame";
+  anyDuplicated(arrayExpr$Hugo_Symbol)
+  rownames(arrayExpr) <- arrayExpr$Hugo_Symbol;
+  arrayExpr$Hugo_Symbol <- arrayExpr$Entrez_Gene_Id <- NULL;
+  arrayExpr <- as.matrix(arrayExpr);
+  stopifnot( mode(arrayExpr) == "numeric" )
+  return(arrayExpr);
+}
+
 ## Analysis methods/pipelines:
 computeKaplanMeier <- function(clin.breast) {
   #'@description Build Kaplan-Meier OS, PFS, and DFS models for TCGA data
@@ -117,13 +141,13 @@ computeKaplanMeier <- function(clin.breast) {
   return(sModels);
 }
 
-drawKaplanMeier <- function(sModels, pTheme, myColors=c("dimgray","red"), showTab=FALSE) {
+drawKaplanMeier <- function(sModels, pTheme, myColors=c("darkolivegreen3","mediumorchid"), showTab=FALSE) {
   #'@description Kaplan-Meier curves using a list of survival models
   require(survminer);
   plotList <- list(); 
   for(n in names(sModels)) {
     m <- sModels[[n]];
-    pTitle <- paste0(Subgroup, ": ", n);
+    pTitle <- n;
     plotList[[n]] <- ggsurvplot(
       m,
       ## Risk Table:

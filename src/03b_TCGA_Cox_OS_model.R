@@ -1,7 +1,7 @@
 ################################################################################################
-# Cox Models by Binary SVM Status, Stratified by TNBC Status, in TCGA
+# Cox Models by Binary SVM Status of Receptor-positive TCGA Tumors
 # Script author: David Chen
-# Date: 02/28/2018; 03/04/2018
+# Script maintainer: David Chen
 # Notes:
 ################################################################################################
 
