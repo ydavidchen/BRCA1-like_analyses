@@ -3,7 +3,6 @@
 # Script author: David Chen
 # Script maintainer: David Chen
 # Notes:
-# 1. Survival data (OS, PFS, DFS) were from Liu et al. 2018 Cell
 #######################################################################################################
 
 rm(list=ls())
@@ -21,6 +20,13 @@ clin.breast <- merge(
   my_samples[ , c("patients","SVM_BRCA1","Age","Stage","ER","PR","HER2","TNBC","PAM50","PAM50lite")], 
   by = "patients"
 );
+
+## For survival analysis, also remove HER2+ tumors:
+table(clin.breast$HER2, useNA="always")
+clin.breast <- subset(clin.breast, HER2=="Negative");
+
+## Exclude tumors without stage
+my_samples <- subset(my_samples, !is.na(Stage));
 
 ## Survival modeling:
 clin.breast$group <- 1 * (clin.breast$SVM_BRCA1=="BRCA1-like");

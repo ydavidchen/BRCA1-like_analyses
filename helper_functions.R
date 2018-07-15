@@ -107,6 +107,49 @@ loadTCGASurvivalMeta <- function(path="~/Dropbox (Christensen Lab)/Pan-cancer-an
   return(metaSurv); 
 }
 
+loadTCGA4CoxOS <- function(path.surv="~/repos/BRCA1ness_by_SVM/annotations_and_backups/TCGA-BRCA_clinical.csv", 
+                           ADMIN_CENSOR=NULL, HER2negOnly=TRUE, receptorPosOnly=TRUE) {
+  #'@description Load TCGA breast tumor annotation for survival analysis
+  #'@param ADMIN_CENSOR Time for administrative censoring in months
+  clin.breast <- read.csv(path.surv, stringsAsFactors=FALSE);
+  colnames(clin.breast)[1] <- "patients";
+  
+  my_samples <- loadReceptorPositiveTumors(receptorPosOnly=receptorPosOnly); 
+  if(HER2negOnly) {
+    my_samples <- subset(my_samples, HER2=="Negative");
+  }
+  my_samples <- subset(my_samples, ! (is.na(Stage) | is.na(Age)) );
+  my_samples <- merge(
+    my_samples[ , c("patients","SVM_BRCA1","Age","Stage","ER","PR","HER2","TNBC","PAM50","PAM50lite")],
+    clin.breast[ , c("patients","days_to_last_follow_up","days_to_death","vital_status")]
+  );
+  
+  ## For patients who died, fill in days to last follow-up:
+  condition <- is.na(my_samples$days_to_last_follow_up) & my_samples$vital_status=="dead";
+  my_samples$days_to_last_follow_up[condition] <- my_samples$days_to_death[condition];
+  
+  ## Define main variable of interest:
+  my_samples$group[my_samples$SVM_BRCA1=="BRCA1-like"] <- 1;
+  my_samples$group[my_samples$SVM_BRCA1=="non-BRCA1-like"] <- 0;
+  my_samples$group <- as.factor(my_samples$group);
+  
+  ## Define main outcome of interest:
+  my_samples$event <- (my_samples$vital_status=="dead");
+  
+  ## Important: Convert days_to_follow-up to months:
+  my_samples$OS_MONTHS <- my_samples$days_to_last_follow_up / 30.44;
+  my_samples$days_to_last_follow_up <- my_samples$days_to_death <- NULL;
+  
+  ## Impose administrative censoring:
+  if(! is.null(ADMIN_CENSOR)) {
+    my_samples$event[my_samples$OS_MONTHS >= ADMIN_CENSOR] <- FALSE; #not dead by definition
+    my_samples$OS_MONTHS[my_samples$OS_MONTHS >= ADMIN_CENSOR] <- ADMIN_CENSOR;
+  }
+  
+  return(my_samples);
+}
+
+
 loadMETABRICtumors <- function(path="~/repos/BRCA1ness_by_SVM/annotations_and_backups/030718_METABRIC_study_population.txt",
                                receptorPosOnly=TRUE) {
   #'@description Load METABRIC breast tumor clinical annotation
@@ -114,6 +157,33 @@ loadMETABRICtumors <- function(path="~/repos/BRCA1ness_by_SVM/annotations_and_ba
   if(receptorPosOnly) {
     sample_clinical <- subset(sample_clinical, TNBC=="Non-TNBC"); 
   }
+  return(sample_clinical); 
+}
+
+loadMETABRIC4CoxOS <- function(ADMIN_CENSOR=NULL, receptorPosOnly=TRUE, HER2negOnly=TRUE) {
+  #'@description Load METABRIC breast tumor annotation for survival analysis
+  sample_clinical <- loadMETABRICtumors(receptorPosOnly=receptorPosOnly);
+  
+  ## Re-code main variable of interest:
+  sample_clinical$group[sample_clinical$SVM_BRCA1=="BRCA1-like"] <- 1;
+  sample_clinical$group[sample_clinical$SVM_BRCA1=="non-BRCA1-like"] <- 0;
+  sample_clinical$group <- as.factor(sample_clinical$group);
+  
+  ## Restrict to ER+/PR+ & HER2- tumors:
+  if(HER2negOnly) {
+    sample_clinical <- subset(sample_clinical, (ER_STATUS=="+" | PR_STATUS=="+") & HER2_STATUS=="-");
+    table(sample_clinical$ER_STATUS, sample_clinical$PR_STATUS, useNA="ifany");
+  }
+  
+  ## Define main outcome of interest:
+  sample_clinical$event <- (sample_clinical$OS_STATUS=="DECEASED");
+  
+  ## Impose administrative censoring:
+  if(! is.null(ADMIN_CENSOR)) {
+    sample_clinical$event[sample_clinical$OS_MONTHS >= ADMIN_CENSOR] <- FALSE; #not dead by definition
+    sample_clinical$OS_MONTHS[sample_clinical$OS_MONTHS >= ADMIN_CENSOR] <- ADMIN_CENSOR;    
+  }
+  
   return(sample_clinical); 
 }
 
