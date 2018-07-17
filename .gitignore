@@ -1,0 +1,37 @@
+# Output files or temp files
+.DS_Store
+.DS_Store?
+.Rhistory
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.html
+*.csv
+*.pyc
+*.jpg
+*.jpeg
+*.png
+*.npy
+*.xlsx
+*.xls
+
+# Description files
+*.pdf
+*.aux
+*.log
+*.blg
+*.bbl
+*.ppt
+*.pptx
+*.doc
+*.docx

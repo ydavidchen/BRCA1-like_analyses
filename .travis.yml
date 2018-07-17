@@ -9,7 +9,7 @@ r:
 
 install:
   - Rscript -e 'install.packages(c("data.table","ggplot2","gdata","survival"))'
-  - Rscript -e 'source("./helper_functions.R")'
 
 script:
-  - make test
+  - Rscript ./helper_functions.R
+  - Rscript ./plot_themes.R

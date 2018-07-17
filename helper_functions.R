@@ -1,11 +1,14 @@
-## Helper functions for SVM BRCA1-like Downstream Statistical Analyses
+## Helper Functions for SVM BRCA1-like Downstream Statistical Analyses
 ## Script author: David Chen
 ## Script maintainer: David Chen
+## Note: Each script in the `src` subdirectory is like a "main", but to be executed interactively.
 
-## Data loading methods:
+#-------------------------------------Data-loading methods-------------------------------------
 loadReceptorPositiveTumors <- function(path="~/repos/BRCA1ness_by_SVM/annotations_and_backups/030418_TCGA_study_population.txt", 
                                        receptorPosOnly=TRUE) {
   #'@description Load clinical annotation for TCGA breast tumors that are positive for ER, PR, and/or HER2
+  #'@param path Path to clinical annotation saved in TXT format
+  #'@param receptorPosOnly Logical, defaults to TRUE. Should data be subsetted to ER+, PR+, and/or HER2+ only?
   my_samples <- read.csv(path, header=TRUE, sep="\t", stringsAsFactors=FALSE);
   if(receptorPosOnly){ 
     my_samples <- subset(my_samples, TNBC=="Non-TNBC");
@@ -15,6 +18,7 @@ loadReceptorPositiveTumors <- function(path="~/repos/BRCA1ness_by_SVM/annotation
 
 loadHRDmetrics <- function(path="~/Dropbox (Christensen Lab)/Pan-cancer-analyses/Marquard AM pan-cancer HRD index/40364_2015_33_MOESM8_ESM.txt") {
   #'@description Load existing HR deficiency metrics published in Marquard et al. 2015
+  #'@param path Path to authors' data file saved in TXT format
   MarquardHRD <- read.table(path, header=TRUE);
   MarquardHRD <- subset(MarquardHRD, Tumor %in% my_samples$patients);
   colnames(MarquardHRD)[colnames(MarquardHRD)=="Tumor"] <- "patients";
@@ -23,6 +27,7 @@ loadHRDmetrics <- function(path="~/Dropbox (Christensen Lab)/Pan-cancer-analyses
 
 loadMutationMeasures <- function(path="~/Dropbox (Christensen Lab)/Pan-cancer-analyses/Kandoth2013Nature/Supplementary_Table_3a.xls") {
   #'@description Load mutational count & rates data published in Kandoth et al. 2013 Nature
+  #'@param path Path to authors' data file saved in Excel format
   require(gdata);
   mutMeasure <- read.xls(path, stringsAsFactors=FALSE);
   mutMeasure <- subset(mutMeasure, Cancer.Type == "brca");
@@ -33,6 +38,7 @@ loadMutationMeasures <- function(path="~/Dropbox (Christensen Lab)/Pan-cancer-an
 
 loadMutationalSignatures <- function(path="~/Dropbox (Christensen Lab)/Pan-cancer-analyses/TCGA_pan_cancer_signature_Rosenthal.txt") {
   #'@description Load TCGA-BRCA mutational signatures published in Rosenthal et al. 2016
+  #'@param path Path to authors' data file saved in TXT format
   rosenthalTCGA <- read.table(path, header=TRUE);
   rosenthalTCGA$id <- gsub(".", "-", rosenthalTCGA$id, fixed=TRUE);
   rosenthalTCGA <- subset(rosenthalTCGA, cancer=="BRCA");
@@ -42,6 +48,7 @@ loadMutationalSignatures <- function(path="~/Dropbox (Christensen Lab)/Pan-cance
 
 loadTCGAGeneLeveExpr <- function(path="~/Dropbox (Christensen Lab)/Breast_Cancer_Data_Sets/All_TCGA_breast_RNAseq/BRCA.rnaseqv2__illuminahiseq_rnaseqv2__unc_edu__Level_3__RSEM_genes_normalized__data.data.txt") {
   #'@description Load TCGA-BRCA gene expression
+  #'@param path Path to TCGA breast cancer gene expression count data in TXT format from FireBrowse
   require(data.table);
   require(splitstackshape);
   rnaMedianExpr <- fread(path);
@@ -75,6 +82,7 @@ loadTCGAGeneLeveExpr <- function(path="~/Dropbox (Christensen Lab)/Breast_Cancer
 
 loadTCGAmiRNA <- function(path="~/Dropbox (Christensen Lab)/Breast_Cancer_Data_Sets/All_TCGA_breast_RNAseq/bcgsc.ca_BRCA_IlluminaGA_miRNASeq.miRNAExp.tsv") {
   #'@description Load TCGA primary breast tumor miRNA data & convert to Z scores
+  #'@param path Path to TCGA miRNA expression data downloaded from SynapseTCGAlive
   require(data.table); 
   miRExpr <- fread(path, stringsAsFactors=FALSE)
   class(miRExpr) <- "data.frame";
@@ -90,6 +98,7 @@ loadTCGAmiRNA <- function(path="~/Dropbox (Christensen Lab)/Breast_Cancer_Data_S
 
 loadTCGASurvivalMeta <- function(path="~/Dropbox (Christensen Lab)/Pan-cancer-analyses/Liu2018_Cell_TCGA_surv/Liu2018_Cell_TCGA-CDR.csv") {
   #'@description Load TCGA pan-cancer survival data from Liu et al. 2018 Cell
+  #'@param path Path to authors' data file saved in CSV format
   metaSurv <- read.csv(path, stringsAsFactors=FALSE);
   metaSurv[metaSurv=="#N/A"] <- NA;
   metaSurv[metaSurv=="[Not Applicable]"] <- NA;
@@ -110,9 +119,10 @@ loadTCGASurvivalMeta <- function(path="~/Dropbox (Christensen Lab)/Pan-cancer-an
 loadTCGA4CoxOS <- function(path.surv="~/repos/BRCA1ness_by_SVM/annotations_and_backups/TCGA-BRCA_clinical.csv", 
                            ADMIN_CENSOR=NULL, HER2negOnly=TRUE, receptorPosOnly=TRUE) {
   #'@description Load TCGA breast tumor annotation for survival analysis
+  #'@param path.surv Path to TCGA data with overall survival information
   #'@param ADMIN_CENSOR Time for administrative censoring in months
-  clin.breast <- read.csv(path.surv, stringsAsFactors=FALSE);
-  colnames(clin.breast)[1] <- "patients";
+  data <- read.csv(path.surv, stringsAsFactors=FALSE);
+  colnames(data)[1] <- "patients";
   
   my_samples <- loadReceptorPositiveTumors(receptorPosOnly=receptorPosOnly); 
   if(HER2negOnly) {
@@ -121,7 +131,7 @@ loadTCGA4CoxOS <- function(path.surv="~/repos/BRCA1ness_by_SVM/annotations_and_b
   my_samples <- subset(my_samples, ! (is.na(Stage) | is.na(Age)) );
   my_samples <- merge(
     my_samples[ , c("patients","SVM_BRCA1","Age","Stage","ER","PR","HER2","TNBC","PAM50","PAM50lite")],
-    clin.breast[ , c("patients","days_to_last_follow_up","days_to_death","vital_status")]
+    data[ , c("patients","days_to_last_follow_up","days_to_death","vital_status")]
   );
   
   ## For patients who died, fill in days to last follow-up:
@@ -153,6 +163,7 @@ loadTCGA4CoxOS <- function(path.surv="~/repos/BRCA1ness_by_SVM/annotations_and_b
 loadMETABRICtumors <- function(path="~/repos/BRCA1ness_by_SVM/annotations_and_backups/030718_METABRIC_study_population.txt",
                                receptorPosOnly=TRUE) {
   #'@description Load METABRIC breast tumor clinical annotation
+  #'@param path Path to METABRIC data file saved in TXT format downloaded via cBioPortal
   sample_clinical <- read.csv(path, sep="\t",stringsAsFactors=FALSE);
   if(receptorPosOnly) {
     sample_clinical <- subset(sample_clinical, TNBC=="Non-TNBC"); 
@@ -162,18 +173,19 @@ loadMETABRICtumors <- function(path="~/repos/BRCA1ness_by_SVM/annotations_and_ba
 
 loadMETABRIC4CoxOS <- function(ADMIN_CENSOR=NULL, receptorPosOnly=TRUE, HER2negOnly=TRUE) {
   #'@description Load METABRIC breast tumor annotation for survival analysis
+  #'@param ADMIN_CENSOR Time for administrative censoring in months
+  #'@param receptorPosOnly Logical, defaults to TRUE. Should data be subsetted to ER+, PR+, and/or HER2+ only?
+  #'@param HER2negOnly Logical, defaults to TRUE. Should HER2-positive/unknown tumors be excluded?
   sample_clinical <- loadMETABRICtumors(receptorPosOnly=receptorPosOnly);
+  if(HER2negOnly) {
+    sample_clinical <- subset(sample_clinical, (ER_STATUS=="+" | PR_STATUS=="+") & HER2_STATUS=="-");
+    table(sample_clinical$ER_STATUS, sample_clinical$PR_STATUS, useNA="ifany");
+  }
   
   ## Re-code main variable of interest:
   sample_clinical$group[sample_clinical$SVM_BRCA1=="BRCA1-like"] <- 1;
   sample_clinical$group[sample_clinical$SVM_BRCA1=="non-BRCA1-like"] <- 0;
   sample_clinical$group <- as.factor(sample_clinical$group);
-  
-  ## Restrict to ER+/PR+ & HER2- tumors:
-  if(HER2negOnly) {
-    sample_clinical <- subset(sample_clinical, (ER_STATUS=="+" | PR_STATUS=="+") & HER2_STATUS=="-");
-    table(sample_clinical$ER_STATUS, sample_clinical$PR_STATUS, useNA="ifany");
-  }
   
   ## Define main outcome of interest:
   sample_clinical$event <- (sample_clinical$OS_STATUS=="DECEASED");
@@ -189,6 +201,7 @@ loadMETABRIC4CoxOS <- function(ADMIN_CENSOR=NULL, receptorPosOnly=TRUE, HER2negO
 
 loadMETABRICarrayExpr <- function(path="~/Dropbox (Christensen Lab)/Breast_Cancer_Data_Sets/METABRIC_data_set_cBio/data_expression.txt") {
   #'@description Load METABRIC breast tumor normalized gene expression TXT file
+  #'@param path Path to METABRIC gene expression data saved in TXT format downloaded via cBioPortal
   require(data.table);
   arrayExpr <- fread(path);
   class(arrayExpr) <- "data.frame";
@@ -200,19 +213,42 @@ loadMETABRICarrayExpr <- function(path="~/Dropbox (Christensen Lab)/Breast_Cance
   return(arrayExpr);
 }
 
-## Analysis methods/pipelines:
-computeKaplanMeier <- function(clin.breast) {
+#-------------------------------------Analytical Methods / Pipelines-------------------------------------
+checkAgeStrata <- function(data, thresh, runFisher=FALSE, ...) {
+  #'@description Check binary age strata in combined TCGA+METABRIC.
+  #'@param data R data.frame with a numeric column named "Age"
+  #'@param thresh Numeric threshold for age stratification, in years
+  #'@param runFisher Logical, defaults to FALSE. Should Fisher's exact test be run?
+  #'@param ... Additional parameters passed to fisher.test
+  s <- table(data$SVM_BRCA1, data$Age > thresh);
+  colnames(s)[colnames(s)=="FALSE"] <- paste("Younger than", thresh, "y");
+  colnames(s)[colnames(s)=="TRUE"] <- paste("Older than", thresh, "y");
+  if(runFisher) {
+    print( fisher.test(s, ...) ); 
+  }
+  ## Marginal sums:
+  s <- cbind(s, Total=rowSums(s));
+  s <- rbind(s, Total=colSums(s));
+  return(s);
+}
+
+computeKaplanMeier <- function(data) {
   #'@description Build Kaplan-Meier OS, PFS, and DFS models for TCGA data
+  #'@param data R data.frame consisting of 0/1 for group and time in months for OS, PFI, DFI
   require(survival);
   sModels <- list();
-  sModels[["OS"]] <- survfit(Surv(time=OS.time, event=OS) ~ group, clin.breast);
-  sModels[["PFS"]] <- survfit(Surv(time=PFI.time, event=PFI) ~ group, clin.breast);
-  sModels[["DFS"]] <- survfit(Surv(time=DFI.time, event=DFI) ~ group, clin.breast);
+  sModels[["OS"]] <- survfit(Surv(time=OS.time, event=OS) ~ group, data);
+  sModels[["PFS"]] <- survfit(Surv(time=PFI.time, event=PFI) ~ group, data);
+  sModels[["DFS"]] <- survfit(Surv(time=DFI.time, event=DFI) ~ group, data);
   return(sModels);
 }
 
 drawKaplanMeier <- function(sModels, pTheme, myColors=c("darkolivegreen3","mediumorchid"), showTab=FALSE) {
   #'@description Kaplan-Meier curves using a list of survival models
+  #'@param sModels Survival model objects
+  #'@param pTheme ggplot theme. Specified in the plot_themes.R script
+  #'@param myColors Colors for each strata compared
+  #'@param showTab Logical, defaults to FALSE. Should ggsurvplot summary table be shown?
   require(survminer);
   plotList <- list(); 
   for(n in names(sModels)) {
