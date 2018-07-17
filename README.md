@@ -10,13 +10,15 @@ The molecular features of homologous recombination (HR)-deficient, BRCA1-like br
 
 Here, we compared the clinical and molecular profiles of BRCA1-like ER/PR/HER2-positive breast tumors with their non-BRCA1-like counterpart (equivalent to "controls"). Our work provides insights into alternative classification approaches and therapeutic-targeting strategies for this heterogeneous disease subgroup.
 
-## File and Folder Structure
+## File Structure
 
-* `src`: Downstream statistical analysis of The Cancer Genome Atlas (TCGA) or Curtis et al./Pereia et al. breast tumor clinical and molecular profiles. Each script is equivalent to a *main* method executed interactively
+All analysis scripts are in the `src` sub-directory.
+
 * `helper_functions.R`: Helper functions for data loading and some analytical approaches
 * `plot_themes.R`: List of themes for `ggplot2` that could be conveniently loaded, used, and modified based on specific data-visualization need
+* All other scripts (numbered 01 to 04) are for downstream statistical analysis of The Cancer Genome Atlas (TCGA) or Curtis et al./Pereia et al. breast tumor clinical and molecular profiles. Each script resembles a *main* method executed interactively
 * Algorithm for copy number genomic mapping and binary classification are available from co-authors upon request.
 
 Please responsibly use materials associated with this repository and provide relevant citations of the manuscript wherever applicable.
 
-Copyright &copy; 2018 ydavidchen
+Copyright &copy; 2018 ydavidchen and Christensen Lab

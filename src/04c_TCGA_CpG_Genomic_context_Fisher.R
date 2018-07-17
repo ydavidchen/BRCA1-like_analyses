@@ -1,7 +1,8 @@
 ###############################################################################################################
 # Test **enriched** genomic contexts, stratified by direction of change of differential Non-TNBC CpGs
 # Script author: David Chen
-# Notes:
+# Script maintainer: David Chen
+# Notes: Helper methods not used in methylation-related analysis
 ###############################################################################################################
 
 rm(list=ls())

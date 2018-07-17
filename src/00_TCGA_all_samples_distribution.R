@@ -11,8 +11,9 @@ library(matrixStats)
 library(reshape2)
 library(tableone)
 library(WriteXLS)
-source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/helper_functions.R"); 
-source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/plot_themes.R");
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
+source("helper_functions.R");
+source("plot_themes.R");
 
 ## Clinical annotation for study population:
 my_samples <- read.csv("~/repos/BRCA1ness_by_SVM/annotations_and_backups/030418_TCGA_study_population.txt", header=T, sep="\t", stringsAsFactors=F);

@@ -11,5 +11,5 @@ install:
   - Rscript -e 'install.packages(c("data.table","ggplot2","gdata","survival"))'
 
 script:
-  - Rscript ./helper_functions.R
-  - Rscript ./plot_themes.R
+  - Rscript src/helper_functions.R
+  - Rscript src/plot_themes.R

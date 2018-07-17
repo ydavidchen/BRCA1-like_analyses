@@ -1,7 +1,8 @@
 ######################################################################################################
-# DMRcate analysis of TCGA Non-TNBCs
+# DMRcate analysis of TCGA hormone receptor-positive BRCA1-like tumors
 # Script author: David Chen
-# Notes:
+# Script maintainer: David Chen
+# Notes: Helper methods not used in methylation-related analysis
 ######################################################################################################
 
 rm(list=ls())

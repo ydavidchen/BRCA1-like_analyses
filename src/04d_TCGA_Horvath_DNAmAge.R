@@ -1,9 +1,8 @@
 ######################################################################################################
 # Comparison of Horvath DNA methylation age by BRCA1-like status
 # Script author: David Chen
-# Date: 03/08/18; 04/24/18
-# Notes:
-# 1. Motivation: to follow-up with the differential methylation in BRCA1-like tumors.
+# Script maintainer: David Chen
+# Notes: Helper methods not used in methylation-related analysis
 ######################################################################################################
 
 rm(list=ls())

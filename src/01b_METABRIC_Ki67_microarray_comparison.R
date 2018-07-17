@@ -6,13 +6,14 @@
 #####################################################################################################
 
 rm(list=ls())
-source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/helper_functions.R"); 
-source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/plot_themes.R");
-sample_clinical <- loadMETABRICtumors(); 
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
+source("helper_functions.R");
+source("plot_themes.R");
+sample_clinical <- loadMETABRICtumors(receptorPosOnly=TRUE); 
 arrayExpr <- loadMETABRICarrayExpr(); 
 
 ## Load gene expression data & subset to Ki67:
-plt.Ki67 <- arrayExpr[rownames(arrayExpr)=="MKI67", , drop=F];
+plt.Ki67 <- arrayExpr[rownames(arrayExpr)=="MKI67", , drop=FALSE];
 plt.Ki67 <- as.data.frame(t(plt.Ki67));
 plt.Ki67$SAMPLE_ID <- rownames(plt.Ki67);
 plt.Ki67 <- merge(

@@ -6,8 +6,10 @@
 ####################################################################################################
 
 rm(list=ls())
-source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/helper_functions.R"); 
-source("~/repos/Repos_for_Manuscript_Code/BRCA1-like_analyses/plot_themes.R");
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
+source("helper_functions.R");
+source("plot_themes.R");
+
 my_samples <- loadReceptorPositiveTumors(receptorPosOnly=TRUE);
 rosenthalTCGA <- loadMutationalSignatures();
 comp.mat <- merge(my_samples, rosenthalTCGA, by="patients");

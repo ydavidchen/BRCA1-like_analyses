@@ -1,7 +1,8 @@
 ################################################################################################
-# Differentially methylated CpGs in TCGA Non-TNBCs
+# Differentially methylated CpGs in TCGA hormone receptor-positive BRCA1-like tumors
 # Script author: David Chen
-# Notes:
+# Script maintainer: David Chen
+# Notes: Helper methods not used in methylation-related analysis
 ################################################################################################
 
 rm(list=ls())

@@ -213,6 +213,25 @@ loadMETABRICarrayExpr <- function(path="~/Dropbox (Christensen Lab)/Breast_Cance
   return(arrayExpr);
 }
 
+loadCombinedTCGAandMETABRIC <- function(receptorPosOnly, HER2negOnly, ADMIN_CENSOR=NULL) {
+  #'@description Combine TCGA and METABRIC data set for survival analysis. 
+  #'@details See loadTCGA4CoxOS and loadMETABRIC4CoxOS for detail
+  sampsTCGA <- loadTCGA4CoxOS(ADMIN_CENSOR=ADMIN_CENSOR, receptorPosOnly=TRUE, HER2negOnly=TRUE);
+  sampsTCGA <- sampsTCGA[ , c("patients","SVM_BRCA1","group","Age","Stage","ER","PR","HER2","event","OS_MONTHS")]; 
+  
+  sampsMETABRIC <- loadMETABRIC4CoxOS(ADMIN_CENSOR=ADMIN_CENSOR, receptorPosOnly=TRUE, HER2negOnly=TRUE);
+  sampsMETABRIC <- sampsMETABRIC[ , c("SAMPLE_ID","SVM_BRCA1","group","AGE_AT_DIAGNOSIS","Stage","ER_STATUS","PR_STATUS","HER2_STATUS","event","OS_MONTHS")];
+  sampsMETABRIC[sampsMETABRIC=="+"] <- "Positive";
+  sampsMETABRIC[sampsMETABRIC=="-"] <- "Negative";
+  colnames(sampsMETABRIC) <- colnames(sampsTCGA);
+  
+  sampsTCGA$dataset <- "TCGA";
+  sampsMETABRIC$dataset <- "METABRIC";
+  sampsCombined <- rbind(sampsTCGA, sampsMETABRIC);
+  
+  return(sampsCombined); 
+}
+
 #-------------------------------------Analytical Methods / Pipelines-------------------------------------
 checkAgeStrata <- function(data, thresh, runFisher=FALSE, ...) {
   #'@description Check binary age strata in combined TCGA+METABRIC.
@@ -232,30 +251,49 @@ checkAgeStrata <- function(data, thresh, runFisher=FALSE, ...) {
   return(s);
 }
 
-computeKaplanMeier <- function(data) {
-  #'@description Build Kaplan-Meier OS, PFS, and DFS models for TCGA data
+calcDescrpStatsByStrata <- function(data, ageThresh=50) {
+  #'@description Print descriptive statistics by age strata, stage, BRCAness, ER/PR/HER2
+  #'@param data R data.frame with a numeric column named "Age", "Stage", "SVM_BRCA1", "ER", "PR", "HER2"
+  #'@param ageThresh Numeric threshold for age stratification, in years
+  print(paste("Age greater than",ageThresh))
+  print(table(data$Age > ageThresh))
+  
+  print("Stage:")
+  print(table(data$Stage, useNA="ifany"))
+  
+  print("ER:")
+  print(table(data$ER, useNA="ifany"))
+  
+  print("PR:")
+  print(table(data$PR, useNA="ifany"))
+  
+  print("HER2:")
+  print(table(data$HER2, useNA="ifany"))
+  
+  print("SVM BRCA1-like status:")
+  print(table(data$SVM_BRCA1, useNA="ifany"))
+}
+
+computeMultipleKaplanMeier <- function(data, pTheme, myColors=c("darkolivegreen3","mediumorchid"), showTab=FALSE) {
+  #'@description Kaplan-Meier curves using a list of survival models
   #'@param data R data.frame consisting of 0/1 for group and time in months for OS, PFI, DFI
+  #'@param pTheme ggplot theme. Specified in the module plot_themes.R
+  #'@param myColors Colors for each strata compared
+  #'@param showTab Logical, defaults to FALSE. Should risk table be shown?
   require(survival);
+  require(survminer);
   sModels <- list();
   sModels[["OS"]] <- survfit(Surv(time=OS.time, event=OS) ~ group, data);
   sModels[["PFS"]] <- survfit(Surv(time=PFI.time, event=PFI) ~ group, data);
   sModels[["DFS"]] <- survfit(Surv(time=DFI.time, event=DFI) ~ group, data);
-  return(sModels);
-}
-
-drawKaplanMeier <- function(sModels, pTheme, myColors=c("darkolivegreen3","mediumorchid"), showTab=FALSE) {
-  #'@description Kaplan-Meier curves using a list of survival models
-  #'@param sModels Survival model objects
-  #'@param pTheme ggplot theme. Specified in the plot_themes.R script
-  #'@param myColors Colors for each strata compared
-  #'@param showTab Logical, defaults to FALSE. Should ggsurvplot summary table be shown?
-  require(survminer);
+  
   plotList <- list(); 
   for(n in names(sModels)) {
     m <- sModels[[n]];
     pTitle <- n;
     plotList[[n]] <- ggsurvplot(
       m,
+      data = data,
       ## Risk Table:
       risk.table.col = "strata",
       risk.table = showTab,
