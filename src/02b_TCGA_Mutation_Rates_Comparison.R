@@ -1,20 +1,18 @@
-##########################################################################################################
 # Comparison of Mutational Rates per Mb with SVM BRCA1-like Status
 # Script author: David Chen
 # Script maintainer: David Chen
 # Notes:
-##########################################################################################################
 
-rm(list=ls())
+rm(list=ls()); 
+library(lmtest);
+library(MASS);
+library(matrixStats);
+library(sandwich);
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
 source("helper_functions.R");
 source("plot_themes.R");
 
-library(lmtest)
-library(MASS)
-library(matrixStats)
-library(sandwich)
-
+## Load clinical & mutational data:
 my_samples <- loadReceptorPositiveTumors(receptorPosOnly=TRUE);
 mutMeasure <- loadMutationMeasures(); 
 comp.mat <- merge(
@@ -24,9 +22,9 @@ comp.mat <- merge(
 );
 table(comp.mat$SVM_BRCA1)
 
-## Statistical test:
-comp.mat$group[comp.mat$SVM_BRCA1=="BRCA1-like"] <- 1;
-comp.mat$group[comp.mat$SVM_BRCA1=="non-BRCA1-like"] <- 0;
+## Statistical modeling:
+comp.mat$group[comp.mat$SVM_BRCA1 == "BRCA1-like"] <- 1;
+comp.mat$group[comp.mat$SVM_BRCA1 == "non-BRCA1-like"] <- 0;
 comp.mat$group <- as.factor(comp.mat$group);
 fit.rates <- rlm(
   `Mutation.Rate...Mbp.` ~ group + Age + Stage + ER + PR + HER2,
@@ -44,8 +42,9 @@ png("~/Downloads/BRCA1ness_figures/Figure3A.png", res=300, units="in", height=8.
 ggplot(comp.mat, aes(x=BRCAness, y=Mutation.Rate...Mbp.)) +
   geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0) +
   geom_point(position=position_jitter(width=0.25), alpha=0.3) + 
-  myBoxplotTheme +  
   labs(y="Mutation rate per Mb") +
+  myBoxplotTheme +
+  
   geom_segment(aes(x=1, y=11.5, xend=2, yend=11.5), size=0.3, inherit.aes=F) +
   geom_segment(aes(x=1, y=10, xend=1, yend=11.5), size=0.3, inherit.aes=F) +
   geom_segment(aes(x=2, y=8, xend=2, yend=11.5), size=0.3, inherit.aes=F) +

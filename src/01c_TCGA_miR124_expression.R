@@ -1,12 +1,10 @@
-######################################################################################################
 # Verifying expression of miRNA showed differential methylation in BRCA1-like tumors
 # Script author: David Chen
 # Script maintainer: David Chen
 # Notes:
 # 1. miR124-2 / miR-124a2: HYPERmethylated in BRCA1-like; modulates proliferation (PMID:25731732)
-######################################################################################################
 
-rm(list=ls())
+rm(list=ls());
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
 source("helper_functions.R");
 source("plot_themes.R");
@@ -28,7 +26,7 @@ my_miRs$group[my_miRs$SVM_BRCA1 == "BRCA1-like"] <- 1;
 my_miRs$group[my_miRs$SVM_BRCA1 == "non-BRCA1-like"] <- 0;
 table(my_miRs$group)
 
-## Statistical test:
+## Statistical modeling:
 fit_miR124a2 <- lm(
   `hsa-mir-124-2` ~ group + Age + Stage + ER + PR + HER2,
   data = my_miRs

@@ -5,20 +5,19 @@
 # Notes: Helper methods not used in methylation-related analysis
 ################################################################################################
 
-rm(list=ls())
-
-library(DMRcate)
-library(ggplot2)
-library(ggrepel)
-library(gridExtra)
-library(matrixStats)
-library(pheatmap)
-library(splitstackshape)
-library(WriteXLS)
-
-library(RColorBrewer)
+rm(list=ls());
+library(DMRcate);
+library(ggplot2);
+library(ggrepel);
+library(gridExtra);
+library(matrixStats);
+library(pheatmap);
+library(splitstackshape);
+library(WriteXLS);
+library(RColorBrewer);
 gradient_cols <- brewer.pal(12, "Paired")
 cols <- brewer.pal(8, "Set1"); #use in numeric order
+HEAT_COLORS <- colorRampPalette(c("yellow","black","blue"))(2048); 
 
 ## Load data & results:
 load("~/Dropbox (Christensen Lab)/Christensen Lab - 2017/BRCA1ness_TCGA_all_types/betas.TCGAC450k.RData");
@@ -91,7 +90,47 @@ pheatmap(
   annotation_col = heat_annot,
   annotation_row = row_annot,
   annotation_colors = ann_colors,
-  color = colorRampPalette(c("yellow", "blue"))(2048),
+  color = HEAT_COLORS,
   fontsize = 9, #labels,titles
   border_color = NA
 );
+
+#----------------------------------Response to BCR Reviewer #1, point d----------------------------------
+table(my_samples$HER2, seNA="ifany")
+her2neg_tumors <- my_samples$patients[my_samples$HER2=="Negative"];
+pheatmap(
+  mat[ , colnames(mat) %in% her2neg_tumors],
+  cutree_cols = 2,
+  show_rownames = FALSE, #CpGs
+  show_colnames = FALSE, #samples
+  annotation_col = heat_annot,
+  annotation_row = row_annot,
+  annotation_colors = ann_colors,
+  color = HEAT_COLORS,
+  fontsize = 9, #labels,titles
+  border_color = NA,
+  main = "ER+/PR+, HER2- Tumors Only"
+);
+
+#----------------------------------Response to BCR Reviewer #1, point e----------------------------------
+## step 1. Extract clusters
+ph <- pheatmap(
+  mat,
+  cutree_cols = 2,
+  silent = TRUE
+);
+sampleClust <- as.data.frame(cutree(ph$tree_col, k=2));
+colnames(sampleClust) <- "Cluster";
+table(sampleClust$Cluster); 
+sampInBLClust <- rownames(sampleClust)[sampleClust$Cluster == 1];
+
+## step 2. Compute intersample Var(beta) for each cluster
+intSampVarBL <- rowVars(mat[ , colnames(mat) %in% sampInBLClust]);
+intSampVarNB <- rowVars(mat[ , ! colnames(mat) %in% sampInBLClust]);
+## step 3a. Plot rank-ordered inter-sample variance distributions 
+par(mfrow=c(1,2));
+plot(sort(intSampVarBL, decreasing=TRUE), main="BRCA1-like Methylation Cluster", xlab="CpG", ylab="Var(beta-value)", ylim=c(0,0.15), bty="l");
+plot(sort(intSampVarNB, decreasing=TRUE), main="Non-BRCA1-like Methylation Cluster", xlab="CpG", ylab="Var(beta-value)", ylim=c(0,0.15), bty="l");
+## step 3b. Compute average
+mean(intSampVarBL);
+mean(intSampVarNB);

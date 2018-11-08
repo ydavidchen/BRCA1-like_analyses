@@ -3,6 +3,9 @@
 ## Script maintainer: David Chen
 ## Note: Each script in the `src` subdirectory is like a "main", but to be executed interactively.
 
+library(doParallel); 
+registerDoParallel(detectCores() - 1);
+
 #-------------------------------------Data-loading methods-------------------------------------
 loadReceptorPositiveTumors <- function(path="~/repos/BRCA1ness_by_SVM/annotations_and_backups/030418_TCGA_study_population.txt", 
                                        receptorPosOnly=TRUE) {
@@ -17,7 +20,7 @@ loadReceptorPositiveTumors <- function(path="~/repos/BRCA1ness_by_SVM/annotation
 }
 
 loadHRDmetrics <- function(path="~/Dropbox (Christensen Lab)/Pan-cancer-analyses/Marquard AM pan-cancer HRD index/40364_2015_33_MOESM8_ESM.txt") {
-  #'@description Load existing HR deficiency metrics published in Marquard et al. 2015
+  #'@description Load existing TCGA HR deficiency metrics published in Marquard et al. 2015
   #'@param path Path to authors' data file saved in TXT format
   MarquardHRD <- read.table(path, header=TRUE);
   MarquardHRD <- subset(MarquardHRD, Tumor %in% my_samples$patients);

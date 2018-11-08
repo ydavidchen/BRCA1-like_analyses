@@ -1,13 +1,11 @@
-#######################################################################################################
-# CoxPH Modeling in METABRIC data set
+# CoxPH Modeling by BRCA1-like Status in METABRIC data set
 # Script authors: David Chen
 # Script maintainer: David Chen
 # Notes:
-#######################################################################################################
 
-rm(list=ls())
-library(survival)
-library(survminer)
+rm(list=ls());
+library(survival);
+library(survminer);
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
 source("helper_functions.R");
 sample_clinical <- loadMETABRIC4CoxOS(ADMIN_CENSOR=60, receptorPosOnly=TRUE, HER2negOnly=TRUE);
