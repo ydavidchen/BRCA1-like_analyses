@@ -77,7 +77,7 @@ ann_colors <- list(
   Context = c(Island="black", Shore="gray30", Shelf="gray70", OpenSea="gray90")
 );
 
-myDMPs <- as.character(dmps$ID[dmps$indfdr < 0.05 & abs(dmps$betafc) >= BETA_CUT]);
+myDMPs <- as.character(dmps$ID[dmps$indfdr < FDR_CUT & abs(dmps$betafc) >= BETA_CUT]);
 mat <- betas_TCGA450k[rownames(betas_TCGA450k) %in% myDMPs, 
                       colnames(betas_TCGA450k) %in% my_samples$patients];
 
@@ -136,16 +136,21 @@ par(mar=c(5,5,4,2));
 plot(
   sort(intSampVarBL, decreasing=TRUE), 
   xlab = "CpG index", ylab="Var(beta-value)", 
+  cex = 0.75,
   cex.lab = 1.5,
   ylim = c(0,0.15), 
   bty = "l", 
-  col="mediumorchid3"
+  col = "mediumorchid3",
+  pch = 16
 );
-points(sort(intSampVarNB, decreasing=TRUE), col="darkolivegreen3");
+points(sort(intSampVarNB, decreasing=TRUE), col="darkolivegreen3", cex=0.75, pch=16);
 abline(h=avgVarBL, col="mediumorchid3", lwd=2, lty=2);
 abline(h=avgVarNBL, col="darkolivegreen3", lwd=2, lty=2);
-legend("topright", legend=c("BRCA1-like","non-BRCA1-like"), col=c("mediumorchid3","darkolivegreen3"), pch=21, bty="n");
-title("Rank-ordered inter-sample variance distribution"); 
+legend(
+  150, 0.15, pch=16, bty="n", cex=1.5,
+  legend = c(paste("BRCA1-like Cluster, mean =", round(avgVarBL,3)), paste("non-BRCA1-like Cluster, mean =", round(avgVarNBL,3) )), 
+  col = c("mediumorchid3","darkolivegreen3")
+);
 
 # intSampVar <- data.frame(
 #   CpG = rownames(mat),

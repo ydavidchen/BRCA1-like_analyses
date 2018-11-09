@@ -2,7 +2,7 @@
 # Script author: David Chen
 # Script maintainer: David Chen
 # Notes:
-# -- Response to BCR Reviewer #2
+# -- Response to BCR Reviewer #2 Comment 5
 
 rm(list=ls());
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
@@ -63,6 +63,7 @@ fisher.test(contTabStage)
 
 ## Restrict to non-BRCA1-like tumors for investigation:
 nonbrca_joined <- subset(combinedTCGA_METABRIC, SVM_BRCA1 == "non-BRCA1-like");
+table(nonbrca_joined$anyBRCAalt, useNA="ifany")
 
 ## Compare continuous variables:
 ## 1) BRCA1-like probability scores:
@@ -70,7 +71,7 @@ fit.prob <- lm(BRCA1_prob ~ anyBRCAalt, data=nonbrca_joined);
 summary(fit.prob);
 
 ## 2) Subject chronological age:
-fit.age  <- lm(BRCA1_prob ~ anyBRCAalt, data=nonbrca_joined);
+fit.age  <- lm(Age ~ anyBRCAalt, data=nonbrca_joined);
 summary(fit.age); 
 
 ## Data visualization:
@@ -78,13 +79,13 @@ nonbrca_joined$BRCA.alteration <- ifelse(nonbrca_joined$anyBRCAalt, "BRCA1/2 alt
 ggplot(nonbrca_joined, aes(x=BRCA.alteration, BRCA1_prob)) +
   geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0) +
   geom_point(position=position_jitter(width=0.25), alpha=0.3) + 
-  labs(y="BRCA1-like probability score") +
+  labs(y="BRCA1-like probability score", title="All non-BRCA1-like tumors (n=2,274)") +
   myBoxplotTheme
 
 ggplot(nonbrca_joined, aes(x=BRCA.alteration, Age)) +
   geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0) +
   geom_point(position=position_jitter(width=0.25), alpha=0.3) + 
-  labs(y="Age (years)") +
+  labs(y="Age (years)", title="All non-BRCA1-like tumors (n=2,274)") +
   myBoxplotTheme
 
 ## Compare tumor stage:
