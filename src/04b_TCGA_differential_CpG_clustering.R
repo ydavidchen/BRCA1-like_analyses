@@ -27,6 +27,11 @@ annot.450k <- as.data.frame(getAnnotation(IlluminaHumanMethylation450kanno.ilmn1
 annot.450k$isEnhancer <- ifelse(annot.450k$Enhancer=="TRUE" | annot.450k$Phantom != "", "Yes", "No");
 annot.450k$isPromoter <- ifelse(grepl("TSS", annot.450k$UCSC_RefGene_Group), "Yes", "No");
 
+## Select CpGs of interest:
+myDMPs <- as.character(dmps$ID[dmps$indfdr < FDR_CUT & abs(dmps$betafc) >= BETA_CUT]);
+mat <- betas_TCGA450k[rownames(betas_TCGA450k) %in% myDMPs, 
+                      colnames(betas_TCGA450k) %in% my_samples$patients]; #for heatmap
+
 #----------------------------------------------Heat map of individually significant CpGs----------------------------------------------
 sum(dmps$betafc > BETA_CUT); sum(dmps$betafc < -BETA_CUT);
 
@@ -76,10 +81,6 @@ ann_colors <- list(
   DNase = c(Yes="black", No="lightgray"),
   Context = c(Island="black", Shore="gray30", Shelf="gray70", OpenSea="gray90")
 );
-
-myDMPs <- as.character(dmps$ID[dmps$indfdr < FDR_CUT & abs(dmps$betafc) >= BETA_CUT]);
-mat <- betas_TCGA450k[rownames(betas_TCGA450k) %in% myDMPs, 
-                      colnames(betas_TCGA450k) %in% my_samples$patients];
 
 pheatmap(
   mat,
@@ -152,15 +153,22 @@ legend(
   col = c("mediumorchid3","darkolivegreen3")
 );
 
-# intSampVar <- data.frame(
-#   CpG = rownames(mat),
-#   BRCA1_like = rowVars(mat[ , colnames(mat) %in% sampInBLClust]),
-#   non_BRCA1_like = rowVars(mat[ , ! colnames(mat) %in% sampInBLClust])
-# );
-# intSampVar <- melt(intSampVar, variable.name="SVM_BRCA1", value.name="Variance");
-# intSampVar$SVM_BRCA1 <- gsub("_", "-", intSampVar$SVM_BRCA1); 
-# 
-# ggplot(intSampVar, aes(reorder(CpG, Variance), Variance)) +
-#   geom_point(aes(color=SVM_BRCA1)) +
-#   facet_wrap(~ SVM_BRCA1) +
-#   myWaterfallTheme
+#----------------------------------Response to BCR Reviewer #1, point i----------------------------------
+annot450KSub <- subset(annot.450k, Name %in% rownames(betas_TCGA450k));
+contTabUniv <- table( 
+  Island = annot450KSub$Relation_to_Island == "Island", 
+  Promoter = annot450KSub$isPromoter
+);
+contTabUniv <- contTabUniv[c(2,1), c(2,1)];
+contTabUniv
+fisher.test(contTabUniv)
+
+annot450KDiff <- subset(annot.450k, Name %in% myDMPs); 
+contTabDiff <- table(
+  Island = annot450KDiff$Relation_to_Island == "Island", 
+  Promoter = annot450KDiff$isPromoter
+);
+contTabDiff <- contTabDiff[c(2,1), c(2,1)];
+contTabDiff
+fisher.test(contTabDiff)
+

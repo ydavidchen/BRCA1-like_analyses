@@ -1,17 +1,14 @@
-###############################################################################################################
 # Test **enriched** genomic contexts, stratified by direction of change of differential Non-TNBC CpGs
 # Script author: David Chen
 # Script maintainer: David Chen
 # Notes: Helper methods not used in methylation-related analysis
-###############################################################################################################
 
-rm(list=ls())
-
-library(ggplot2)
-library(gridExtra)
-library(matrixStats)
-library(reshape2)
-library(doParallel); registerDoParallel(detectCores() - 1)
+rm(list=ls());
+library(ggplot2);
+library(gridExtra);
+library(matrixStats);
+library(reshape2);
+library(doParallel); registerDoParallel(detectCores() - 1);
 
 ## Load data & results:
 load("~/Dropbox (Christensen Lab)/Christensen Lab - 2017/BRCA1ness_TCGA_all_types/030418_DMRcate_Non-TNBCs.RData");
