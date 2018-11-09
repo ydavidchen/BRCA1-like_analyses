@@ -1,11 +1,9 @@
-#####################################################################################################
 # Comparison of Ki-67 microarray gene expression by BRCA1-like status in METABRIC
 # Script author: David Chen
 # Script maintainer: David Chen
 # Notes:
-#####################################################################################################
 
-rm(list=ls())
+rm(list=ls()); 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
 source("helper_functions.R");
 source("plot_themes.R");
@@ -26,7 +24,7 @@ plt.Ki67$group[plt.Ki67$SVM_BRCA1=="non-BRCA1-like"] <- 0;
 plt.Ki67$group <- as.factor(plt.Ki67$group);
 table(plt.Ki67$group)
 
-## Statistical test:
+## Statistical modeling:
 fit_other <- lm(
   MKI67 ~ group + AGE_AT_DIAGNOSIS + Stage + ER_STATUS + PR_STATUS + HER2_STATUS,
   data = plt.Ki67

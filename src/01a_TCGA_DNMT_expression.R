@@ -1,12 +1,10 @@
-######################################################################################################
 # Comparing DNMT1/3A/3B RNAseq gene expression levels by BRCA1-like Status in TCGA
 # Script author: David Chen
 # Script maintainer: David Chen
 # Notes:
-######################################################################################################
 
-rm(list=ls())
-library(reshape2)
+rm(list=ls());
+library(reshape2);
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
 source("helper_functions.R");
 source("plot_themes.R");
@@ -25,7 +23,7 @@ plt.DNMTs$BRCAness[plt.DNMTs$SVM_BRCA1=="non-BRCA1-like"] <- 0;
 plt.DNMTs$BRCAness <- as.factor(plt.DNMTs$BRCAness);
 table(plt.DNMTs$BRCAness)
 
-## Statistical tests:
+## Statistical modeling by gene:
 fitDNMT1 <- lm(
   DNMT1 ~ BRCAness + Age + Stage + ER + PR + HER2, 
   data = plt.DNMTs

@@ -1,11 +1,9 @@
-##########################################################################################################
-# Relation of HR Deficiency Metrics with SVM BRCA1-like Score
+# Comparison of HR Deficiency Metrics with SVM BRCA1-like Status
 # Script author: David Chen
 # Script maintainer: David Chen
 # Notes:
-##########################################################################################################
 
-rm(list=ls())
+rm(list=ls());
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
 source("helper_functions.R");
 source("plot_themes.R");
@@ -24,12 +22,12 @@ comp.mat$Subtype[comp.mat$TNBC=="Non-TNBC"] <- "Non-TNBC (143 BRCA1-like, 503 no
 
 #-------------------------------------------Correlative analyses-------------------------------------------
 ## HRD-LOH Score:
-stopifnot( sum(is.na(comp.mat$HRD.LOH)) == 0 ) #ensure no missing value in outcome
+stopifnot(sum(is.na(comp.mat$HRD.LOH)) == 0); #ensure no missing value in outcome
 fitHRD <- lm(HRD.LOH ~ BRCA1_prob, data=comp.mat);
 summary(fitHRD)
 
 ## LST Score
-stopifnot( sum(is.na(comp.mat$LST)) == 0 ) #ensure no missing value in outcome
+stopifnot(sum(is.na(comp.mat$LST)) == 0); #ensure no missing value in outcome
 fitLST <- lm(LST ~ BRCA1_prob, data = comp.mat);
 summary(fitLST)
 
@@ -47,11 +45,8 @@ ggplot(comp.mat, aes(x=BRCA1_prob, y=LST)) +
   geom_jitter() +
   geom_smooth(method="lm", se=FALSE) +
   labs(x="BRCA1-like probability", y="Large Scale Transition (LST) score") +
-  theme_classic() +
-  theme(axis.text.x=element_text(size=15,color="black"), axis.title.x=element_text(size=15,color="black"),
-        axis.text.y=element_text(size=15,color="black"), axis.title.y=element_text(size=15,color="black"),
-        strip.text.x=element_text(size=12,colour="black",face="bold"),
-        legend.position="top", legend.title=element_blank(), legend.text=element_text(size=15,color="black")) +
+  myScatterTheme +
+  
   annotate(geom="text",x=0.25,y=40,label="P < 2.2e-16 ***",size=6) +
   annotate(geom="text",x=0.25,y=37,label="R-squared = 0.31",size=6) +
   annotate(geom="text",x=0.25,y=34,label="Coef. = 14.2",size=6)

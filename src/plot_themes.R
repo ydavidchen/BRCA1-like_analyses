@@ -40,5 +40,6 @@ myWaterfallTheme <- theme_classic() +
   theme(axis.text.x=element_blank(), axis.text.y=element_text(size=20,color="black"),
         axis.ticks.x=element_blank(),
         axis.title=element_text(size=25, color="black"), title=element_text(size=25, color="black"),
+        strip.text.x=element_text(size=15,colour="black",face="bold"),
         legend.position="top",legend.title=element_blank(),legend.text=element_text(size=15,color="black"));
 

@@ -4,36 +4,50 @@
 # Notes:
 
 rm(list=ls());
-library(ggplot2);
-library(matrixStats);
-library(reshape2);
 library(tableone);
-library(WriteXLS);
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
 source("helper_functions.R");
 source("plot_themes.R");
+TSIZE <- 5; 
+BIN_COLORS <- c("dimgray","lightblue"); 
 
 ## Clinical annotation for study population:
 my_samples <- read.csv("~/repos/BRCA1ness_by_SVM/annotations_and_backups/030418_TCGA_study_population.txt", header=T, sep="\t", stringsAsFactors=F);
+
 mySampNoExclu <- read.csv("~/repos/BRCA1ness_by_SVM/annotations_and_backups/031318_Complete_Sample_Sheet_No_Exclusion.txt", header=T, sep="\t", stringsAsFactors=F);
 mySampNoExclu$includedInBRCA1Analysis <- mySampNoExclu$patients %in% my_samples$patients;
 mySampNoExclu$anyRecepPos <- mySampNoExclu$ER=="Positive" |  mySampNoExclu$PR=="Positive" | mySampNoExclu$HER2=="Positive";
 
 #---------------------------------------Distribution of BRCA1-like probability---------------------------------------
-mySampNoExclu$recepPos[mySampNoExclu$anyRecepPos] <- "Receptor Positive";
-mySampNoExclu$recepPos[! mySampNoExclu$anyRecepPos] <- "TNBC";
-mySampNoExclu$recepPos[is.na(mySampNoExclu$anyRecepPos)] <- "Unknown"; 
+table(mySampNoExclu$anyRecepPos, useNA="ifany");
+labelRP <- "Receptor Positive (n = 754)"; 
+labelTN <- "TNBC (n = 100)";
 
-png("~/Downloads/BRCA1ness_figures/Figure2B.png", res=300, units="in", height=6, width=11.69);
-ggplot(subset(mySampNoExclu, recepPos != "Unknown"), aes(x=reorder(patients, BRCA1_prob), y=BRCA1_prob, fill=recepPos)) +
-  geom_bar(stat="identity") +
+mySampNoExclu$recepPos[mySampNoExclu$anyRecepPos] <- labelRP;
+mySampNoExclu$recepPos[! mySampNoExclu$anyRecepPos] <- labelTN;
+mySampNoExclu$recepPos[is.na(mySampNoExclu$anyRecepPos)] <- "Unknown";
+
+contTab <- table(
+  BRCAness = mySampNoExclu$SVM_BRCA1, 
+  Subtype = mySampNoExclu$recepPos
+);
+contTab
+
+png("~/Downloads/BRCA1ness_figures/Figure2_TCGA.png", res=300, units="in", height=6, width=11.69);
+ggplot(subset(mySampNoExclu, recepPos != "Unknown"), aes(x=reorder(patients, BRCA1_prob), y=BRCA1_prob)) +
+  geom_bar(aes(fill=recepPos), stat="identity", show.legend=FALSE) +
   geom_hline(yintercept=0.50, linetype="dashed") + 
-  labs(x="TCGA Sample", y="SVM BRCA1-like probability", title="TCGA") +
+  labs(x="\n TCGA Sample", y="SVM BRCA1-like probability \n", title="TCGA") +
   scale_x_discrete(expand=c(0, 0)) +
   scale_y_continuous(breaks=seq(0,1,0.2), expand=c(0,0), limits=c(0,1.05)) +
-  scale_fill_manual(values=c("black","blue","lightgray")) +
+  scale_fill_manual(values=BIN_COLORS) +
   myWaterfallTheme  +
-  facet_wrap(~ recepPos, scale="free")
+  facet_wrap(~ recepPos, scale="free") +
+  
+  geom_text(data=data.frame(x=150, y=0.6, label="159 (21.1%) \n BRCA1-like", recepPos=labelRP), aes(x,y,label=label), size=TSIZE, inherit.aes=FALSE) +
+  geom_text(data=data.frame(x=150, y=0.4, label="595 (78.9%) \n non-BRCA1-like", recepPos=labelRP), aes(x,y,label=label), size=TSIZE, inherit.aes=FALSE) +
+  geom_text(data=data.frame(x=20, y=0.6, label="88 (88.0%) \n BRCA1-like", recepPos=labelTN), aes(x,y,label=label), size=TSIZE, inherit.aes=FALSE) +
+  geom_text(data=data.frame(x=20, y=0.4, label="12 (12.0%) \n non-BRCA1-like", recepPos=labelTN), aes(x,y,label=label), size=TSIZE, inherit.aes=FALSE)
 dev.off();
 
 #---------------------------------------------Table One: Overall---------------------------------------------

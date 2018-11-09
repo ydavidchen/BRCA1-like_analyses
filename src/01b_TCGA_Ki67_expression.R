@@ -1,11 +1,9 @@
-######################################################################################################
 # Comparing Ki-67 RNAseqV2 gene expression levels in TCGA
 # Script author: David Chen
 # Script maintainer: David Chen
 # Notes:
-######################################################################################################
 
-rm(list=ls())
+rm(list=ls());
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
 source("helper_functions.R");
 source("plot_themes.R");
@@ -26,7 +24,7 @@ ki67 <- as.data.frame(t(ki67));
 ki67$patients <- rownames(ki67);
 ki67 <- merge(ki67, my_samples[ , c("patients","group","Age","Stage","ER","PR","HER2")], by="patients");
 
-## Statistical test:
+## Statistical modeling:
 fitki67 <- lm(
   MKI67 ~ group + Age + Stage + ER + PR + HER2, 
   data = ki67
