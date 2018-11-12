@@ -108,33 +108,3 @@ myTableOne <- CreateTableOne(
 y <- print(myTableOne, showAllLevels=TRUE); 
 # write.csv(y, file="~/Downloads/BRCA1ness_figures/041118_TCGA_Subset_Table_one.csv",quote=F);
 
-#---------------------------------------------Response to Reviewer #1, comment g---------------------------------------------
-contTabRace <- matrix(c(60,61, (201+20+1), (488+36+0)), byrow=TRUE, ncol=2);
-contTabRace
-sum(contTabRace)
-fisher.test(contTabRace)
-
-#---------------------------------------------Response to Reviewer #2, comment 7---------------------------------------------
-contTabStageByDataset <- matrix(c((63+165),(26+102),(238+473),(220+1106)), byrow=TRUE, ncol=2);
-contTabStageByDataset
-sum(contTabStageByDataset)
-fisher.test(contTabStageByDataset)
-
-contTabStageTCGA <- matrix(c(63,165,238,473), byrow=TRUE, ncol=2);
-contTabStageTCGA
-fisher.test(contTabStageTCGA)
-
-contTabStageMETABRIC <- matrix(c(26,102,220,1106), byrow=TRUE, ncol=2);
-contTabStageMETABRIC
-fisher.test(contTabStageMETABRIC)
-
-png("~/Downloads/BRCA1ness_figures/Age_distribution_TCGA.png", res=300, units="in", height=6, width=11.69);
-ggplot(mySampNoExclu, aes(Age, color=SVM_BRCA1, fill=SVM_BRCA1)) +
-  geom_density(alpha=0.25) +
-  scale_fill_manual(values=c("mediumorchid3","darkolivegreen3")) +
-  scale_color_manual(values=c("mediumorchid3","darkolivegreen3")) +
-  scale_y_continuous(limits=c(0,0.04)) +
-  ggtitle("TCGA") +
-  facet_wrap(~ SVM_BRCA1) +
-  myScatterTheme
-dev.off();

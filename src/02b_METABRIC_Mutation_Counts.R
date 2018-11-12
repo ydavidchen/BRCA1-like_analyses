@@ -1,4 +1,4 @@
-# Query METABRIC Mutational Burden
+# Compare METABRIC Mutational Burden in Receptor-positive Tumors
 # Script author: David Chen
 # Script maintainer: David Chen
 # Notes:
@@ -32,6 +32,16 @@ summary(fit)
 svar.rlm <- sandwich(fit);
 coeftest(fit, vcov.=svar.rlm, type="HC0");
 
+## Calculate mean by group:
+mean(compMat$Mutation.Count[compMat$group==1], na.rm=TRUE)
+sd(compMat$Mutation.Count[compMat$group==1], na.rm=TRUE)
+
+mean(compMat$Mutation.Count[compMat$group==0], na.rm=TRUE)
+sd(compMat$Mutation.Count[compMat$group==0], na.rm=TRUE)
+
+## Data visualization:
+compMat$SVM_BRCA1[compMat$SVM_BRCA1=="BRCA1-like"] <- "BRCA1-like \n (n=104)";
+compMat$SVM_BRCA1[compMat$SVM_BRCA1=="non-BRCA1-like"] <- "non-BRCA1-like \n (n=1085)";
 png("~/Downloads/BRCA1ness_figures/METABRIC_mut_count.png", res=300, units="in", height=8.27, width=6);
 ggplot(compMat, aes(x=SVM_BRCA1, y=Mutation.Count)) +
   geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0) +
