@@ -35,3 +35,7 @@
 *.pptx
 *.doc
 *.docx
+
+# Classification files (available by formal request only)
+SVM_Classifier_to_Save_Final.R
+SVM_Classifier_Visualization.R

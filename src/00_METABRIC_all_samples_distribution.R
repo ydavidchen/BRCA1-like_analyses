@@ -12,6 +12,7 @@ library(WriteXLS);
 library(doParallel); registerDoParallel(detectCores() - 1);
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
 source("plot_themes.R");
+
 TSIZE <- 5; 
 BIN_COLORS <- c("dimgray","lightblue"); 
 

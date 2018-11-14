@@ -15,14 +15,16 @@ combine_TCGA_and_metabric <- function(path.tcga, path.metabric) {
   ## TCGA:
   mySampNoExclu_tcga <- read.csv(path.tcga, sep="\t", header=TRUE, stringsAsFactors=FALSE);
   mySampNoExclu_tcga$anyBRCAalt <- mySampNoExclu_tcga$BRCA1.mut | mySampNoExclu_tcga$BRCA2.mut | mySampNoExclu_tcga$BRCA1meth; 
-  mySampNoExclu_tcga <- mySampNoExclu_tcga[ , c("patients","BRCA1_prob","SVM_BRCA1","Age","ajcc_pathologic_tumor_stage","Stage","anyBRCAalt")]; 
+  mySampNoExclu_tcga <- mySampNoExclu_tcga[ , c("patients","BRCA1_prob","SVM_BRCA1","Age","ajcc_pathologic_tumor_stage","Stage","anyBRCAalt","ER")]; 
   mySampNoExclu_tcga$misclassif <- mySampNoExclu_tcga$anyBRCAalt & mySampNoExclu_tcga$SVM_BRCA1=="non-BRCA1-like";
   mySampNoExclu_tcga$dataset <- "TCGA"; 
   
   ## METABRIC:
   sampNoExclu_metabric <- read.csv(path.metabric, sep="\t", stringsAsFactors=FALSE);
+  sampNoExclu_metabric$ER_STATUS[sampNoExclu_metabric$ER_STATUS=="+"] <- "Positive";
+  sampNoExclu_metabric$ER_STATUS[sampNoExclu_metabric$ER_STATUS=="-"] <- "Negative";
   sampNoExclu_metabric$anyBRCAalt <- sampNoExclu_metabric$BRCA1mut | sampNoExclu_metabric$BRCA2mut; 
-  sampNoExclu_metabric <- sampNoExclu_metabric[ , c("SAMPLE_ID","BRCA1_Prob","SVM_BRCA1","AGE_AT_DIAGNOSIS","TUMOR_STAGE","Stage","anyBRCAalt")]; 
+  sampNoExclu_metabric <- sampNoExclu_metabric[ , c("SAMPLE_ID","BRCA1_Prob","SVM_BRCA1","AGE_AT_DIAGNOSIS","TUMOR_STAGE","Stage","anyBRCAalt","ER_STATUS")]; 
   sampNoExclu_metabric$misclassif <- sampNoExclu_metabric$anyBRCAalt & sampNoExclu_metabric$SVM_BRCA1=="non-BRCA1-like";
   sampNoExclu_metabric$dataset <- "METABRIC";
   
@@ -65,6 +67,18 @@ contTabRace <- matrix(c(60,61, (201+20+1), (488+36+0)), byrow=TRUE, ncol=2);
 contTabRace
 sum(contTabRace)
 fisher.test(contTabRace)
+
+#---------------------------------------------Response to Reviewer #2, comment X---------------------------------------------
+table(combinedTCGA_METABRIC$dataset)
+contTabERpos <- table(
+  Dataset = combinedTCGA_METABRIC$dataset,
+  ER_expr = combinedTCGA_METABRIC$ER,
+  useNA = "always"
+);
+
+contTabERpos
+print(1501/1968) #METABRIC
+print(209 / (209+704)) #TCGA, excluding 44 missing
 
 #---------------------------------------------Response to Reviewer #2, comment 7---------------------------------------------
 ## Stage, based on numbers reported in Supplemental Table 3:

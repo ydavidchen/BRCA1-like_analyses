@@ -8,7 +8,7 @@ r:
   - "3.4"
 
 install:
-  - Rscript -e 'install.packages(c("data.table","ggplot2","gdata","survival"))'
+  - Rscript -e 'install.packages(c("data.table","ggplot2","gdata","survival","doParallel"))'
 
 script:
   - Rscript src/helper_functions.R
