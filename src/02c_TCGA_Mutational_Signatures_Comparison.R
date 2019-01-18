@@ -1,9 +1,7 @@
-####################################################################################################
 # Comparison of Somatic Mutational Signatures by SVM BRCA1-like status in TCGA
 # Script author: David Chen
 # Script maintainer: David Chen
 # Notes:
-####################################################################################################
 
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
@@ -28,16 +26,17 @@ fitSig3 <- lm(
 );
 summary(fitSig3)
 
-png("~/Downloads/BRCA1ness_figures/Figure3B.png", res=300, units="in", height=8.27, width=6);
+png("~/Downloads/Final_revision/Figure3B.png", res=300, units="in", height=8.27, width=6.5);
 ggplot(comp.mat, aes(x=BRCAness, y=Signature.3)) +
   geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0) +
   geom_point(position=position_jitter(width=0.25), alpha=0.3) + 
-  myBoxplotTheme +
   labs(y="Mutational Signature 3") +
-  geom_segment(aes(x=1, y=1, xend=2, yend=1), size=0.3, inherit.aes=F) +
-  geom_segment(aes(x=1, y=0.9, xend=1, yend=1), size=0.3, inherit.aes=F) +
-  geom_segment(aes(x=2, y=0.8, xend=2, yend=1), size=0.3, inherit.aes=F) +
-  annotate("text", x=1.5, y=1.03, label="*** P = 2.46e-05", size=7)
+  myBoxplotTheme +
+  
+  geom_segment(aes(x=1, y=1, xend=2, yend=1), size=0.3, inherit.aes=FALSE) +
+  geom_segment(aes(x=1, y=0.9, xend=1, yend=1), size=0.3, inherit.aes=FALSE) +
+  geom_segment(aes(x=2, y=0.8, xend=2, yend=1), size=0.3, inherit.aes=FALSE) +
+  annotate("text", x=1.5, y=1.03, label="*** P = 2.46e-05", size=10)
 dev.off();
 
 #----------------------------------------Statistical test: Signature 1----------------------------------------

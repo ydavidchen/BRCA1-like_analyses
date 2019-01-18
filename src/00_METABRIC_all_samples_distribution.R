@@ -13,7 +13,7 @@ library(doParallel); registerDoParallel(detectCores() - 1);
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path));
 source("plot_themes.R");
 
-TSIZE <- 5; 
+TSIZE <- 8; 
 BIN_COLORS <- c("dimgray","lightblue"); 
 
 ## Load clinical data:
@@ -38,7 +38,7 @@ contTab <- table(
 );
 contTab
 
-png("~/Downloads/BRCA1ness_figures/Figure2_METABRIC.png", res=300, units="in", height=6, width=11.69);
+png("~/Downloads/Final_revision/Figure2_METABRIC.png", res=300, units="in", height=6, width=11.69);
 ggplot(sampNoExclu, aes(x=reorder(SAMPLE_ID, BRCA1_Prob), y=BRCA1_Prob)) + #fill=DNAm_avail
   geom_bar(aes(fill=recepPos), stat="identity", show.legend=FALSE) + #customized
   geom_hline(yintercept=0.50, linetype="dashed") + 
@@ -50,10 +50,10 @@ ggplot(sampNoExclu, aes(x=reorder(SAMPLE_ID, BRCA1_Prob), y=BRCA1_Prob)) + #fill
   myWaterfallTheme +
   facet_wrap(~ recepPos, scale="free")  +
   
-  geom_text(data=data.frame(x=400, y=0.6, label="143 (8.7%) \n BRCA1-like", recepPos=labelRP), aes(x,y,label=label), size=TSIZE, inherit.aes=FALSE) +
-  geom_text(data=data.frame(x=400, y=0.4, label="1508 (91.3%) \n non-BRCA1-like", recepPos=labelRP), aes(x,y,label=label), size=TSIZE, inherit.aes=FALSE) +
-  geom_text(data=data.frame(x=50, y=0.6, label="200 (63.1%) \n BRCA1-like", recepPos=labelTN), aes(x,y,label=label), size=TSIZE, inherit.aes=FALSE) +
-  geom_text(data=data.frame(x=50, y=0.4, label="117 (36.9%) \n non-BRCA1-like", recepPos=labelTN), aes(x,y,label=label), size=TSIZE, inherit.aes=FALSE)
+  geom_text(data=data.frame(x=400, y=0.65, label="143 (8.7%) \n BRCA1-like", recepPos=labelRP), aes(x,y,label=label), size=TSIZE, inherit.aes=FALSE) +
+  geom_text(data=data.frame(x=400, y=0.35, label="1508 (91.3%) \n non-BRCA1-like", recepPos=labelRP), aes(x,y,label=label), size=TSIZE, inherit.aes=FALSE) +
+  geom_text(data=data.frame(x=75, y=0.65, label="200 (63.1%) \n BRCA1-like", recepPos=labelTN), aes(x,y,label=label), size=TSIZE, inherit.aes=FALSE) +
+  geom_text(data=data.frame(x=75, y=0.35, label="117 (36.9%) \n non-BRCA1-like", recepPos=labelTN), aes(x,y,label=label), size=TSIZE, inherit.aes=FALSE)
 dev.off();
 
 #---------------------------------------Table One on overall---------------------------------------

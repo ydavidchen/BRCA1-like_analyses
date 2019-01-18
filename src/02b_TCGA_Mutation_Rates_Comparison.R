@@ -38,15 +38,16 @@ coeftest(fit.rates, vcov.=svar.rlm, type="HC0");
 comp.mat$BRCAness[comp.mat$SVM_BRCA1=="BRCA1-like"] <- "BRCA1-like \n (n=138)";
 comp.mat$BRCAness[comp.mat$SVM_BRCA1=="non-BRCA1-like"] <- "non-BRCA1-like \n (n=453)";
 
-png("~/Downloads/BRCA1ness_figures/Figure3A.png", res=300, units="in", height=8.27, width=6);
+png("~/Downloads/Final_revision/Figure3A.png", res=300, units="in", height=8.27, width=6.5);
 ggplot(comp.mat, aes(x=BRCAness, y=Mutation.Rate...Mbp.)) +
   geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0) +
   geom_point(position=position_jitter(width=0.25), alpha=0.3) + 
+  scale_y_continuous(limits=c(-0.05, 12.75), breaks=seq(0,12.5,2.5)) +
   labs(y="Mutation rate per Mb") +
   myBoxplotTheme +
   
-  geom_segment(aes(x=1, y=11.5, xend=2, yend=11.5), size=0.3, inherit.aes=F) +
-  geom_segment(aes(x=1, y=10, xend=1, yend=11.5), size=0.3, inherit.aes=F) +
-  geom_segment(aes(x=2, y=8, xend=2, yend=11.5), size=0.3, inherit.aes=F) +
-  annotate("text", x=1.5, y=11.95, label="** P = 0.0015", size=7)
+  geom_segment(aes(x=1, y=11.5, xend=2, yend=11.5), size=0.3, inherit.aes=FALSE) +
+  geom_segment(aes(x=1, y=10, xend=1, yend=11.5), size=0.3, inherit.aes=FALSE) +
+  geom_segment(aes(x=2, y=8, xend=2, yend=11.5), size=0.3, inherit.aes=FALSE) +
+  annotate("text", x=1.5, y=11.95, label="** P = 0.0015", size=10)
 dev.off();

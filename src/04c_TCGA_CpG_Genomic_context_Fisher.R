@@ -9,6 +9,7 @@ library(gridExtra);
 library(matrixStats);
 library(reshape2);
 library(doParallel); registerDoParallel(detectCores() - 1);
+P_TEXT_SZ <- 8;
 
 ## Load data & results:
 load("~/Dropbox (Christensen Lab)/Christensen Lab - 2017/BRCA1ness_TCGA_all_types/030418_DMRcate_Non-TNBCs.RData");
@@ -117,22 +118,25 @@ for(directionInBRCA in c("202 HYPOmethylated","148 HYPERmethylated") ){ #"350 di
   plt.summFisher$P <- signif(plt.summFisher$P, 3);
   write.csv(plt.summFisher, file=paste0("~/Downloads/BRCA1ness_figures/", directionInBRCA, ".csv"), row.names=F, quote=F );
   plotList[[directionInBRCA]] <- ggplot(plt.summFisher, aes(x=Category, y=OR, ymin=CI.lower, ymax=CI.upper)) +
-    geom_pointrange(size=0.6, color=myColor) +
-    geom_hline(yintercept=1.00,size=0.2,linetype="dashed",color=myColor) +
+    geom_pointrange(size=0.9, color=myColor) +
+    geom_hline(yintercept=1.00,size=0.3,linetype="dashed",color=myColor) +
     coord_flip() + #order: left to right becomes bottom to up
-    scale_y_continuous(limits=c(-0.25,4.5)) + #consistent scale for all
+    scale_y_continuous(limits=c(-0.75,4.5), breaks=seq(0,4,1)) + #consistent scale for all
     theme_classic() +
-    theme(axis.line=element_line(color=myColor), axis.ticks=element_line(color=myColor),
-          axis.text=element_text(size=15,color=myColor), title=element_text(size=13,face="bold",color=myColor),
-          axis.title.x=element_text(size=16,face="bold",color=myColor), axis.title.y=element_blank()) +
-    labs(x="", y="Odds Ratio (OR)", title=paste(directionInBRCA,"CpGs in BRCA1-like")) +
-    annotate("text", 5.15, plt.summFisher$OR[1], label=paste("P =", plt.summFisher$P[1]),size=5,color=myColor) +
-    annotate("text", 4.15, plt.summFisher$OR[2], label=paste("P =", plt.summFisher$P[2]),size=5,color=myColor) +
-    annotate("text", 3.15, plt.summFisher$OR[3], label=paste("P =", plt.summFisher$P[3]),size=5,color=myColor) +
-    annotate("text", 2.15, plt.summFisher$OR[4], label=paste("P =", plt.summFisher$P[4]),size=5,color=myColor) +
-    annotate("text", 1.15, plt.summFisher$OR[5], label=paste("P =", plt.summFisher$P[5]),size=5,color=myColor)
+    theme(axis.line=element_line(color=myColor), 
+          axis.ticks=element_line(color=myColor),
+          axis.text=element_text(size=24, color=myColor), 
+          title=element_text(size=24, face="bold", color=myColor),
+          axis.title.x=element_text(size=24, color=myColor), 
+          axis.title.y=element_blank()) +
+    labs(x="", y="Odds Ratio (OR)", title=paste(directionInBRCA,"\n CpGs in BRCA1-like")) +
+    annotate("text", 5.325, plt.summFisher$OR[1], label=paste("P =", plt.summFisher$P[1]), size=P_TEXT_SZ, color=myColor) +
+    annotate("text", 4.325, plt.summFisher$OR[2], label=paste("P =", plt.summFisher$P[2]), size=P_TEXT_SZ, color=myColor) +
+    annotate("text", 3.325, plt.summFisher$OR[3], label=paste("P =", plt.summFisher$P[3]), size=P_TEXT_SZ, color=myColor) +
+    annotate("text", 2.325, plt.summFisher$OR[4], label=paste("P =", plt.summFisher$P[4]), size=P_TEXT_SZ, color=myColor) +
+    annotate("text", 1.325, plt.summFisher$OR[5], label=paste("P =", plt.summFisher$P[5]), size=P_TEXT_SZ, color=myColor)
 }
 
-png("~/Downloads/BRCA1ness_figures/Figure4B.png", res=300, units="in", height=5, width=11.69);
+png("~/Downloads/Final_revision/Figure4A.png", res=300, units="in", height=5, width=11.69);
 grid.arrange(grobs=plotList, ncol=2);
 dev.off();

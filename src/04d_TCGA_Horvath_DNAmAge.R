@@ -1,21 +1,19 @@
-######################################################################################################
 # Comparison of Horvath DNA methylation age by BRCA1-like status
 # Script author: David Chen
 # Script maintainer: David Chen
 # Notes: Helper methods not used in methylation-related analysis
-######################################################################################################
 
-rm(list=ls())
-library(gdata)
-library(ggplot2)
-library(reshape2)
-library(wateRmelon)
+rm(list=ls());
+library(gdata);
+library(ggplot2);
+library(reshape2);
+library(wateRmelon);
 
 ## Load data & results:
 load("~/Dropbox (Christensen Lab)/Christensen Lab - 2017/BRCA1ness_TCGA_all_types/betas.TCGAC450k.RData");
 load("~/Dropbox (Christensen Lab)/Christensen Lab - 2017/BRCA1ness_TCGA_all_types/030418_DMRcate_Non-TNBCs.RData");
 
-## Check if all Non-TNBCs:
+## Check if all receptor-positive/Non-TNBCs:
 table(my_samples$TNBC)
 
 ## Mutual subsetting
@@ -73,22 +71,25 @@ ggplot(my_samples, aes(x=Age, y=Horvath, color=BRCAness)) +
   annotate("text", 110, 15, label="P = 4.44E-09", size=6) 
 
 ## 2 scatter plots:
-png("~/Downloads/BRCA1ness_figures/Figure3C.png", res=300, units="in", height=8.27, width=8.27);
+XY_LIMIT <- c(25,130);
+BREAKS <- seq(25,100, by=25); 
+ORDERED_COLOR <- c("mediumorchid3","darkolivegreen3"); 
+
+png("~/Downloads/Final_revision/Figure4B.png", res=300, units="in", height=8.27, width=8.27);
 ggplot(my_samples, aes(x=Age, y=Horvath, color=BRCAness)) +
-  geom_point(aes(alpha=BRCAness), size=3) +
-  geom_smooth(aes(fill=BRCAness), method="lm", alpha=0.3, se=FALSE) +
-  scale_color_manual(values=c("mediumorchid3","darkolivegreen3")) + 
-  scale_fill_manual(values=c("mediumorchid3","darkolivegreen3")) +
-  scale_alpha_manual(values=c(0.9, 0.8)) +
-  labs(x="Chronological Age (years)", y="Methylation Age (years)") +
+  geom_point(aes(alpha=BRCAness), size=3.5) +
+  geom_smooth(aes(fill=BRCAness), method="lm", alpha=0.75, size=2, se=FALSE) +
   geom_abline(slope=1, intercept=0, color="lightgray", linetype="dashed") +
-  scale_x_continuous(limit=c(25,130), breaks=seq(25,100,by=25)) +
-  scale_y_continuous(limit=c(25,130), breaks=seq(25,125,by=25)) +
-  scale_size_continuous(breaks=seq(-30, 30, by=15)) +
+  scale_color_manual(values=ORDERED_COLOR) + 
+  scale_fill_manual(values=ORDERED_COLOR) +
+  scale_alpha_manual(values=c(0.75, 0.65)) +
+  scale_x_continuous(limit=XY_LIMIT, breaks=BREAKS) +
+  scale_y_continuous(limit=XY_LIMIT, breaks=BREAKS) +
+  labs(x="Chronological Age (years)", y="Methylation Age (years)") +
   theme_bw() +
-  theme(axis.text=element_text(size=20,color="black"), axis.title=element_text(size=20,color="black"),
-        legend.position="top", legend.title=element_blank(),legend.text=element_text(size=14,color="black",face="bold"),
-        strip.text.x=element_text(size=12,colour="black",face="bold"))
+  theme(axis.text=element_text(size=26,color="black"), 
+        axis.title=element_text(size=26,color="black"),
+        legend.text=element_text(size=23,color="black",face="bold"),legend.position="top", legend.title=element_blank())
 dev.off();
 
 #-------------------------------------------------Linear model controlling for covariates-------------------------------------------------
@@ -110,28 +111,28 @@ plt.age <- melt(my_samples[ , c("patients", "BRCAness", "Age", "Horvath")]);
 plt.age$variable <- gsub("Age", "Chronological Age", plt.age$variable);
 plt.age$variable <- gsub("Horvath", "Methylation Age", plt.age$variable);
 
-png("~/Downloads/BRCA1ness_figures/Figure3C_right.png", res=300, units="in", height=8.27, width=8.27);
+png("~/Downloads/Final_revision/Figure4C.png", res=300, units="in", height=8.27, width=8.27);
 ggplot(plt.age, aes(x=variable, y=value, color=BRCAness)) +
-  geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0, position=position_dodge(width=0.775)) + #must hide outliers if jitters are to be shown
-  geom_point(position=position_jitterdodge(jitter.width=0.25), alpha=0.3) + # add jitter
+  geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0, position=position_dodge(width=0.775)) +
+  geom_point(position=position_jitterdodge(jitter.width=0.25), alpha=0.35) + 
   scale_fill_manual(values=c("mediumorchid3","darkolivegreen3")) +
   scale_color_manual(values=c("mediumorchid3","darkolivegreen3")) + 
   scale_y_continuous(breaks=seq(25, 125, by=25), limits=c(20,154)) +
   theme_classic() +
-  theme(axis.text=element_text(size=20,color="black"),
-        axis.title.x=element_blank(), axis.title.y=element_text(size=20,color="black"),
-        legend.position="top", legend.title=element_blank(),legend.text=element_text(size=14,color="black",face="bold"),
-        strip.text.x=element_text(size=12,colour="black",face="bold")) +
+  theme(axis.text=element_text(size=26,color="black"),
+        axis.title.x=element_blank(), 
+        axis.title.y=element_text(size=26,color="black"),
+        legend.position="top", legend.title=element_blank(),legend.text=element_text(size=20,color="black",face="bold")) +
   
   labs(y="Age (years)") +
   
-  geom_segment(aes(x=1.81, y=150, xend=2.19, yend=150), size=0.3, inherit.aes=F) +
-  geom_segment(aes(x=1.81, y=120, xend=1.81, yend=150), size=0.3, inherit.aes=F) +
-  geom_segment(aes(x=2.19, y=140, xend=2.19, yend=150), size=0.3, inherit.aes=F) +
-  annotate("text", x=2, y=153, label="P = 0.0182", size=7) +
+  geom_segment(aes(x=1.81, y=150, xend=2.19, yend=150), size=0.5, inherit.aes=FALSE) +
+  geom_segment(aes(x=1.81, y=120, xend=1.81, yend=150), size=0.5, inherit.aes=FALSE) +
+  geom_segment(aes(x=2.19, y=140, xend=2.19, yend=150), size=0.5, inherit.aes=FALSE) +
+  annotate("text", x=2, y=153, label="P = 0.0182", size=8) +
   
-  geom_segment(aes(x=0.81, y=100, xend=1.19, yend=100), size=0.3, inherit.aes=F) +
-  geom_segment(aes(x=0.81, y=95, xend=0.81, yend=100), size=0.3, inherit.aes=F) +
-  geom_segment(aes(x=1.19, y=95, xend=1.19, yend=100), size=0.3, inherit.aes=F) +
-  annotate("text", x=1, y=103, label="n.s.", size=7)
+  geom_segment(aes(x=0.81, y=100, xend=1.19, yend=100), size=0.5, inherit.aes=FALSE) +
+  geom_segment(aes(x=0.81, y=95, xend=0.81, yend=100), size=0.5, inherit.aes=FALSE) +
+  geom_segment(aes(x=1.19, y=95, xend=1.19, yend=100), size=0.5, inherit.aes=FALSE) +
+  annotate("text", x=1, y=105, label="(n.s.)", size=8)
 dev.off();

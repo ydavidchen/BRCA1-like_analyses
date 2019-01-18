@@ -36,7 +36,7 @@ table(ki67$group)
 ki67$BRCAness[ki67$group==1] <- "BRCA1-like \n (n=159)";
 ki67$BRCAness[ki67$group==0] <- "non-BRCA1-like \n (n=578)";
 
-png("~/Downloads/BRCA1ness_figures/Figure3C.png", res=300, units="in", height=8.27, width=6);
+png("~/Downloads/Final_revision/Figure3C.png", res=300, units="in", height=8.27, width=6.5);
 ggplot(ki67, aes(x=BRCAness, y=MKI67)) +
   geom_boxplot(outlier.size=0, outlier.shape=0, outlier.alpha=0) +
   geom_point(position=position_jitter(width=0.25), alpha=0.3) + 
@@ -45,5 +45,5 @@ ggplot(ki67, aes(x=BRCAness, y=MKI67)) +
   geom_segment(aes(x=1, y=10000, xend=2, yend=10000), size=0.3, inherit.aes=FALSE) +
   geom_segment(aes(x=1, y=9000, xend=1, yend=10000), size=0.3, inherit.aes=FALSE) +
   geom_segment(aes(x=2, y=8000, xend=2, yend=10000), size=0.3, inherit.aes=FALSE) +
-  annotate("text", x=1.5, y=10500, label="*** P = 1.21e-07", size=7)
+  annotate("text", x=1.5, y=10500, label="*** P = 1.21e-07", size=10)
 dev.off();

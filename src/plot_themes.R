@@ -26,9 +26,9 @@ myBarplotTheme <- theme_classic() +
         legend.position="top",legend.title=element_blank(),legend.text=element_text(size=12,color="black") ); 
 
 myBoxplotTheme <- theme_classic() +
-  theme(axis.text.x=element_text(size=21,color="black"), axis.text.y=element_text(size=21,color="black"),
+  theme(axis.text.x=element_text(size=24,color="black"), axis.text.y=element_text(size=30, color="black"),
         axis.title.x=element_blank(), axis.title.y=element_text(size=30,color="black"),
-        title=element_text(size=15,color="black"));
+        title=element_text(size=25, color="black"));
 
 mySuppBoxplotTheme <- theme_classic() +
   theme(axis.text.x=element_text(face="italic",size=16,color="black"), axis.text.y=element_text(size=16,color="black"),
@@ -39,7 +39,8 @@ mySuppBoxplotTheme <- theme_classic() +
 myWaterfallTheme <- theme_classic() +
   theme(axis.text.x=element_blank(), axis.text.y=element_text(size=20,color="black"),
         axis.ticks.x=element_blank(),
-        axis.title=element_text(size=25, color="black"), title=element_text(size=25, color="black"),
-        strip.text.x=element_text(size=15,colour="black",face="bold"),
-        legend.position="top",legend.title=element_blank(),legend.text=element_text(size=15,color="black"));
+        axis.title=element_text(size=25, color="black"), 
+        title=element_text(size=25, color="black"),
+        strip.text.x=element_text(size=20, colour="black", face="bold"),
+        legend.position="top", legend.title=element_blank(), legend.text=element_text(size=15,color="black"));
 

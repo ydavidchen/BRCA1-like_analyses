@@ -43,7 +43,7 @@ ggplot(plt.Ki67, aes(x=BRCAness, y=MKI67, color=BRCAness)) +
   scale_color_manual(values=c("mediumorchid3","darkolivegreen3")) + 
   labs(y="MKI67 expression (microarray)", title="METABRIC") +
   myBoxplotTheme +
-  geom_segment(aes(x=1, y=7.3, xend=2, yend=7.3), size=0.3, inherit.aes=F) +
-  geom_segment(aes(x=1, y=7, xend=1, yend=7.3), size=0.3, inherit.aes=F) +
-  geom_segment(aes(x=2, y=6.8, xend=2, yend=7.3), size=0.3, inherit.aes=F) +
-  annotate("text", x=1.5, y=7.4, label="*** P = 2.49e-12", size=7)
+  geom_segment(aes(x=1, y=7.3, xend=2, yend=7.3), size=0.3, inherit.aes=FALSE) +
+  geom_segment(aes(x=1, y=7, xend=1, yend=7.3), size=0.3, inherit.aes=FALSE) +
+  geom_segment(aes(x=2, y=6.8, xend=2, yend=7.3), size=0.3, inherit.aes=FALSE) +
+  annotate("text", x=1.5, y=7.4, label="*** P = 2.49e-12", size=8)
